@@ -1,0 +1,144 @@
+<!DOCTYPE html> <html><!--
+ Page saved with SingleFile 
+ url: http://localhost:6060/pkg/github.com/MrKAKTyC/lets-go-chat/pkg/hasher/ 
+ saved date: Wed Nov 03 2021 21:37:41 GMT+0200 (Eastern European Standard Time)
+--><meta charset=utf-8>
+<meta name=viewport content="width=device-width, initial-scale=1">
+<meta name=theme-color content=#375EAB>
+<title>hasher - Go Documentation Server</title>
+<style>body{margin:0;font-family:Arial,sans-serif;background-color:#fff;line-height:1.3;text-align:center;color:#222}pre,code{font-family:Menlo,monospace;font-size:0.875rem}pre{line-height:1.4;overflow-x:auto}a{color:#375eab;text-decoration:none}a:hover,.exampleHeading .text:hover,.expandAll:hover{text-decoration:underline}p{max-width:50rem;word-wrap:break-word}p,pre{margin:1.25rem}pre{background:#efefef;padding:0.625rem;border-radius:0.3125rem}h1,h2,h3{margin:1.25rem 0 1.25rem;padding:0;color:#375eab;font-weight:bold}h1{font-size:1.75rem;line-height:1}h1 .text-muted{color:#777}h2{font-size:1.25rem;background:#e0ebf5;padding:0.5rem;line-height:1.25;font-weight:normal;overflow:auto;overflow-wrap:break-word}h2 a{font-weight:bold}h3{line-height:1.25;overflow:auto;overflow-wrap:break-word}h3{margin:1.25rem 0.3125rem}dl{margin:1.25rem}dd{margin:0 0 0 1.25rem}dl,dd{font-size:0.875rem}#pkg-index h3{font-size:1rem}.top-heading{float:left;padding:1.313rem 0;font-size:1.25rem;font-weight:normal}.top-heading a{color:#222;text-decoration:none}div#topbar{background:#e0ebf5;height:4rem;overflow:hidden}div#page{width:100%}div#page>.container,div#topbar>.container{text-align:left;margin-left:auto;margin-right:auto;padding:0 1.25rem}div#page.wide>.container,div#topbar.wide>.container{max-width:none}div#footer{text-align:center;color:#666;font-size:0.875rem;margin:2.5rem 0}input#search{padding:0.625rem;text-decoration:none;font-size:1rem;border-radius:0.3125rem}input#search{border:0.0625rem solid #375eab}div#menu{text-align:right;padding:0.625rem;white-space:nowrap;max-height:0;-moz-transition:max-height 0.25s linear;transition:max-height 0.25s linear;width:100%}::-webkit-input-placeholder{color:#7f7f7f;opacity:1}::placeholder{color:#7f7f7f;opacity:1}#menu .search-box{display:inline-flex;width:8.75rem}input#search{background:white;color:#222;box-sizing:border-box;-webkit-appearance:none;border-top-right-radius:0;border-bottom-right-radius:0;border-right:0;margin-right:0;flex-grow:1;max-width:100%;min-width:5.625rem}input#search:-moz-ui-invalid{box-shadow:unset}input#search+button{display:inline;font-size:1em;background-color:#375eab;color:white;border:0.0625rem solid #375eab;border-top-left-radius:0;border-top-right-radius:0.3125rem;border-bottom-left-radius:0;border-bottom-right-radius:0.3125rem;margin-left:0;cursor:pointer}input#search+button span{display:flex}input#search+button svg{fill:white}@supports (--c: 0){[style*='--aspect-ratio-padding:']{position:relative;overflow:hidden;padding-top:var(--aspect-ratio-padding)}[style*='--aspect-ratio-padding:']>*{position:absolute;top:0;left:0;width:100%;height:100%}}.toggleButton{cursor:pointer}.toggleVisible>.expanded{display:block}h2{clear:right}@media (max-width:58.125em){#heading-wide{display:none}}@media (min-width:43.75em) and (max-width:62.5em){input#search{font-size:0.875rem}}@media (max-width:43.75em){body{font-size:0.9375rem}pre,code{font-size:0.866rem}div#page>.container{padding:0 0.625rem}div#topbar{height:auto;padding:0.625rem}div#topbar>.container{padding:0}#heading-wide{display:block}.top-heading{float:none;padding:0.75rem}div#menu{padding:0;text-align:left;float:left}#menu .search-box{display:flex;width:100%}p,pre{margin:0.625rem}}@media (max-width:30em){#heading-wide{display:none}}</style>
+<meta class=CryptoPluginExtensionLoaded content=1.0.2><link type=image/x-icon rel="shortcut icon" href="data:image/x-icon;base64,AAABAAIAICAAAAEAIACoEAAAJgAAABAQAAABAAgAaAUAAM4QAAAoAAAAIAAAAEAAAAABACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABUTjj/VE44//7hdv/+4Xb//uF2//7hdv/+4Xb//uF2//7hdv/+4Xb//uF2//7hdv/+4Xb//uF2//7hdv/+4Xb//uF2//7hdv/+4Xb//uF2//7hdv/+4Xb//uF2//7hdv/+4Xb//uF2/1ROOP9UTjj/AAAAAAAAAAAAAAAAAAAAAFROOP9UTjj//uF2//7hdv/+4Xb//uF2//7hdv/+4Xb//uF2//7hdv/+4Xb//uF2//7hdv/+4Xb//uF2//7hdv/+4Xb//uF2//7hdv/+4Xb//uF2//7hdv/+4Xb//uF2//7hdv/+4Xb/VE44/1ROOP8AAAAAAAAAAAAAAAAAAAAAVE44/1ROOP/+4Xb//uF2//7hdv/+4Xb//uF2//7hdv/+4Xb//uF2//7hdv/+4Xb//uF2//7hdv/+4Xb//uF2//7hdv/+4Xb//uF2//7hdv/+4Xb//uF2//7hdv/+4Xb//uF2//7hdv9UTjj/VE44/wAAAAAAAAAAAAAAAAAAAABUTjj/VE44//7hdv/+4Xb//uF2//7hdv/+4Xb//uF2//7hdv/+4Xb//uF2//7hdv/+4Xb//uF2//7hdv/+4Xb//uF2//7hdv/+4Xb//uF2//7hdv/+4Xb//uF2//7hdv/+4Xb//uF2/1ROOP9UTjj/AAAAAAAAAAAAAAAAAAAAAFROOP9UTjj//uF2//7hdv/+4Xb//uF2//7hdv/+4Xb//uF2//7hdv/+4Xb//uF2//7hdv/+4Xb//uF2//7hdv/+4Xb//uF2//7hdv/+4Xb//uF2//7hdv/+4Xb//uF2//7hdv/+4Xb/VE44/1ROOP8AAAAAAAAAAAAAAAAAAAAAVE44/1ROOP/+4Xb//uF2//7hdv/+4Xb//uF2//7hdv/+4Xb//uF2//7hdv/+4Xb//uF2//7hdv/+4Xb//uF2//7hdv/+4Xb//uF2//7hdv/+4Xb//uF2//7hdv/+4Xb//uF2//7hdv9UTjj/VE44/wAAAAAAAAAAAAAAAAAAAABUTjj/VE44//7hdv/+4Xb//uF2//7hdv/+4Xb//uF2//7hdv/+4Xb//uF2//7hdv/+4Xb//uF2//7hdv/+4Xb//uF2//7hdv/+4Xb//uF2//7hdv/+4Xb//uF2//7hdv/+4Xb//uF2/1ROOP9UTjj/AAAAAAAAAAAAAAAAAAAAAFROOP9UTjj//uF2//7hdv/+4Xb//uF2//7hdv/+4Xb//uF2//7hdv/+4Xb//uF2//7hdv/+4Xb//uF2//7hdv/+4Xb//uF2//7hdv/+4Xb//uF2//7hdv/+4Xb//uF2//7hdv/+4Xb/VE44/1ROOP8AAAAAAAAAAAAAAAAAAAAAVE44/1ROOP/+4Xb//uF2//7hdv/+4Xb//uF2//7hdv/+4Xb//uF2//7hdv/+4Xb//uF2//7hdv/+4Xb//uF2//7hdv/+4Xb//uF2//7hdv/+4Xb//uF2//7hdv/+4Xb//uF2//7hdv9UTjj/VE44/wAAAAAAAAAAAAAAAAAAAABUTjj/VE44//7hdv/+4Xb//uF2//7hdv/+4Xb//uF2//7hdv/+4Xb//uF2//7hdv/+4Xb//uF2//7hdv/+4Xb//uF2//7hdv/+4Xb//uF2//7hdv/+4Xb//uF2//7hdv/+4Xb//uF2/1ROOP9UTjj/AAAAAAAAAAAAAAAAAAAAAFROOP9UTjj//uF2//7hdv/+4Xb//uF2//7hdv/+4Xb//uF2//7hdv/+4Xb//uF2//7hdv/+4Xb//uF2//7hdv/+4Xb//uF2//7hdv/+4Xb//uF2//7hdv/+4Xb//uF2//7hdv/+4Xb/VE44/1ROOP8AAAAAAAAAAAAAAAAAAAAAVE44/1ROOP/+4Xb//uF2//7hdv/+4Xb//uF2//7hdv/+4Xb//uF2//7hdv/+4Xb//uF2//7hdv/+4Xb//uF2//7hdv/+4Xb//uF2//7hdv/+4Xb//uF2//7hdv/+4Xb//uF2//7hdv9UTjj/VE44/wAAAAAAAAAAAAAAAAAAAABUTjj/VE44//7hdv/+4Xb//uF2//7hdv/+4Xb//uF2//7hdv/+4Xb//uF2//7hdv/awWX/xrBc/8awXP/fxmj//uF2//7hdv/+4Xb//uF2//7hdv/+4Xb//uF2//7hdv/+4Xb//uF2/1ROOP9UTjj/AAAAAAAAAAAAAAAAAAAAAFROOP9UTjj//uF2//7hdv/+4Xb//uF2//7hdv/+4Xb//uF2//7hdv/+4Xb//uF2/+bhzf/7/P//+/z//+LavP/+4Xb//uF2//7hdv/+4Xb//uF2//7hdv/+4Xb//uF2//7hdv/+4Xb/VE44/1ROOP8AAAAAAAAAAAAAAAAAAAAAVE44/1ROOP/+4Xb//uF2//7hdv/+4Xb//uF2//7hdv/+4Xb//uF2//jcc//mzGv/8fDq//v8///7/P//6eXX/+TKav/43HP//uF2//7hdv/+4Xb//uF2//7hdv/+4Xb//uF2//7hdv9UTjj/VE44/wAAAAAAAAAAAAAAAAAAAABUTjj/VE44//7hdv/+4Xb//uF2//7hdv/+4Xb//uF2//7hdv/73nX/qZpg/5STfP+Un7f/mqbB/5unwv+TnLD/lpN6/7CfX//+4Xb//uF2//7hdv/+4Xb//uF2//7hdv/+4Xb//uF2/1ROOP9UTjj/AAAAAAAAAAAAAAAAAAAAAFROOP9UTjj//uF2//7hdv/+4Xb//uF2//7hdv/+4Xb//uF2//jcef92jcD/dIzD/3SMw/90jMP/dIzD/3SMw/90jMP/fI+3//7hdv/+4Xb//uF2//7hdv/+4Xb//uF2//7hdv/+4Xb/VE44/1ROOP8AAAAAAAAAAAAAAAAAAAAAVE44/1ROOP/+4Xb//uF2//7hdv/+4nv//u6x///32f//+eP///XP/6Cptf90jMP/U2KF/zM5Sf81PEz/WWqQ/3SMw/+wtLL///LD///zyf/+7q///uN///7hdv/+4Xb//uF2//7hdv9UTjj/VE44/wAAAAAAAAAAAAAAAAAAAABUTjj/VE44//7hdv/+4Xb//uSE///66P///////////////////////v///8zKvf8fICP/HyAj/x8gI/8nKCr/3d7X/////////////////////////fT//uiY//7hdv/+4Xb//uF2/1ROOP9UTjj/AAAAAAAAAAAAAAAAAAAAAFROOP9UTjj//uF2//7hdv//+N7//////////////////////////////////////6CXdv9MRzT/UUs1/7Otmv///////////////////////////////////ff//uSF//7hdv/+4Xb/VE44/1ROOP8AAAAAAAAAAAAAAAAAAAAAVE4481ROOP/43HT//uiV///////////////////////29vb/X2Fj/ygqLv97fX///vvv//7hd//+55H//////////////////////9TU1f9AQUT/MTI2/7O0tf//8cH//uF2//jcdP9UTjj/VE448wAAAAAAAAAAAAAAAAAAAABUTjjaVE44/+vQb//+7rP//////////////////////5eYmv8RExf/ERMX/xETF//BwsP//uWG//7usf//////////////////////UFFU/xETF/8RExf/HyEl//z13f/+4Xb/6tBv/1ROOP9TTjjZAAAAAAAAAAAAAAAAAAAAAFVPN69UTjj/yrVj//7vtP//////////////////////lpaY/xETF/8RExf/ERMX/8DAwf/+5Yf//u6x//////////////////////9PUFP/ERMX/xETF/8eICT/+/Tc//7hdv/Js2L/VE44/1ROOLEAAAAAAAAAAAAAAABUTjlVV1I59JCBTv/iyWz//uiX///////////////////////19fX/W1xf/yUmKv92d3n//vvx//7hd//+55P//////////////////////9HS0v87PUD/LC4x/7Cwsv//8sL//uF2/9jAaP94bUX/VE44+FRPOWcAAAAAVEw5Q1dQOf7Su2b/7dJw//zfdv/94Hb///jg///////////////////////////////////////+7rP//uF2//7hdv//99n///////////////////////////////////34//7lhv/+4Xb//uF2//fbc/+ikVT/VE44/1VPOFdVTji7gnZJ//PYc/+djVP/nY5S//bac//944T///rq//////////////////////////////TL//7hd//+4Xb//uF2//7jgf//+OD////////////////////////99v/+6Zr//uB2/9a+Z/+YiVH/sZ9Z//XZc/9UTjj/VU440FRPOOBrYkD/+t50//nddf/+4Xb/ybNi/5KDTv/123n//u+0///33f//+eX///XS//7qoP/+4Xb//uF2//7hdv/+4Xb//uF2//7hd//+66P///PH///0zP/+7rP//uOA//XZc/+hkVT/6c9u//fbc//t0nD/28Np/1ROOP9UTjj1VU43wVROOP9+ckf/sqBb/4x+Tf9UTjj/VE44/2hfP//ArF//+dx0//7hdv/+4Xb//uF2//7hdv/+4Xb//uF2//7hdv/+4Xb//uF2//7hdv/+4Xb//uF2//jcdP/ArF//Z18//1ROOP9dVTv/o5JV/6qZV/9lXT7/VE44/1NNONZUTDlDVE44/FROOP9UTjj/VE44/1ROOP9UTzjjVE44/1ROOP9fVzv/koRP/7ShW//UvWf/581t//HWcf/63nT/+t50//HWcf/nzW3/1L1n/7ShW/+ShE//X1c7/1ROOP9UTjj/VU453FROOP9UTjj/VE44/1ROOP9UTjj+VU84VwAAAABUTzY9VE85uVROON5VTjjKVU44aQAAAAJTTTlZU04431ROOP9UTjj/VE44/1ROOP9UTjj/VE44/1ROOP9UTjj/VE44/1ROOP9UTjj/VE44/1ROOP9UTjj/U0443FNNOFYAAAABVE44W1ROOMNTTjjfVE44wFRNOEkAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABVVVUDUk43QVRPOJJUTzi8VE443lROOO5UTjjuVE44/1ROOP9UTjjxVE447lROOONUTzi8VE43j1RPNj2AgAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAAPAAAADwAAAA8AAAAPAAAADwAAAA8AAAAPAAAADwAAAA8AAAAPAAAADwAAAA8AAAAPAAAADwAAAA8AAAAPAAAADwAAAA8AAAAPAAAADwAAAA8AAAAPAAAADgAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAf8AAP//////KAAAABAAAAAgAAAAAQAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABETFwAfICMALiwnAFdOMQBUTjgAdWU3AHhoNAB7c04AqpJIAKWSVAB0jMMAyKdOAI6ZpgCmo4kAyLNyAMKyegDPu3kAyr+PAMzBlgDz1XQA/913AP/fdwD/33gA/+F1AP/geQD+4XYA5+HSAPX2+wD3+v8A+/z/APv+/wD///8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgBBkZGRkZGRkZGRkZGQQgIAQZGRkZGRkZGRkZGRkEICAEGRkZGRkZGRkZGRkZBCAgBBkZGRkZGRkZGRkZGQQgIAQZGRkZGRkZGRkZGRkEICAEGRkZGRkZGRkZGRkZBCAgBBkZGRkZEA8ZFRQUGQQgIAQZGRkYCh0dChkUFBkEICAEGRUZGQ0KCgwZFxYZBCAgBBkTHx8OAQEOHx8TGQQgIAQZGh4AAhkZGh0AAhkEIAQGCxofAAIZGRofAAILBQQECwgOGxwOGRkOHx8OCAsEIAQHCAsLGRkZGRIRCQcEICAgICAHBwMEBAMHByAgICAgICAgICAgICAgICAgICAggAEAAIABAACAAQAAgAEAAIABAACAAQAAgAEAAIABAACAAQAAgAEAAIABAAAAAAAAAAAAAIABAADwDwAA//8AAA=="><style>.sf-hidden{display:none!important}</style><link rel=canonical href=http://localhost:6060/pkg/github.com/MrKAKTyC/lets-go-chat/pkg/hasher/><meta http-equiv=content-security-policy content="default-src 'none'; font-src 'self' data:; img-src 'self' data:; style-src 'unsafe-inline'; media-src 'self' data:; script-src 'unsafe-inline' data:;"></head>
+<body data-new-gr-c-s-check-loaded=8.888.0 data-gr-ext-installed>
+<div id=lowframe style="position:fixed;bottom:0;left:0;height:0;width:100%;border-top:thin solid grey;background-color:white;overflow:auto">
+...
+</div>
+<div id=topbar class=wide><div class=container>
+<div class=top-heading id=heading-wide><a href=http://localhost:6060/pkg/>Go Documentation Server</a></div>
+<div class="top-heading sf-hidden" id=heading-narrow></div>
+<a href=# id=menu-button class=sf-hidden></a>
+<form method=GET action=/search>
+<div id=menu style=min-width:60px>
+<span class=search-box><input type=search id=search name=q placeholder=Search aria-label=Search required value><button type=submit><span><svg width=24 height=24 viewBox="0 0 24 24"><title>submit search</title><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"></path><path d="M0 0h24v24H0z" fill=none></path></svg></span></button></span>
+</div>
+</form>
+</div></div>
+<div id=page class=wide style="outline:currentcolor none 0px" tabindex=-1>
+<div class=container>
+ <h1>
+ Package hasher
+ <span class=text-muted></span>
+ </h1>
+<div id=nav></div>
+ 
+ 
+ 
+ <div id=short-nav>
+ <dl>
+ <dd><code>import "github.com/MrKAKTyC/lets-go-chat/pkg/hasher"</code></dd>
+ </dl>
+ <dl>
+ <dd><a href=#pkg-overview class=overviewLink>Overview</a></dd>
+ <dd><a href=#pkg-index class=indexLink>Index</a></dd>
+ 
+ 
+ </dl>
+ </div>
+ 
+ <div id=pkg-overview class=toggleVisible>
+ <div class="collapsed sf-hidden">
+ 
+ </div>
+ <div class=expanded>
+ <h2 class=toggleButton title="Click to hide Overview section">Overview ▾</h2>
+ <p>
+Package hasher provides functions for hashing string and comparing string with hash
+</p>
+ 
+ </div>
+ </div>
+ <div id=pkg-index class=toggleVisible>
+ <div class="collapsed sf-hidden">
+ 
+ </div>
+ <div class=expanded>
+ <h2 class=toggleButton title="Click to hide Index section">Index ▾</h2>
+ 
+ <div id=manual-nav>
+ <dl>
+ 
+ 
+ 
+ 
+ <dd><a href=#CheckPasswordHash>func CheckPasswordHash(password, hash string) bool</a></dd>
+ 
+ 
+ <dd><a href=#HashPassword>func HashPassword(password string) (string, error)</a></dd>
+ 
+ 
+ 
+ </dl>
+ </div>
+ 
+ 
+ <h3>Package files</h3>
+ <p>
+ <span style=font-size:90%>
+ 
+ <a href=http://localhost:6060/src/github.com/MrKAKTyC/lets-go-chat/pkg/hasher/hasher.go>hasher.go</a>
+ 
+ </span>
+ </p>
+ 
+ </div>
+ </div>
+ 
+ 
+ 
+ 
+ 
+ 
+ <h2 id=CheckPasswordHash>func <a href="http://localhost:6060/src/github.com/MrKAKTyC/lets-go-chat/pkg/hasher/hasher.go?s=774:824#L15">CheckPasswordHash</a>
+ <a class="permalink sf-hidden" href=#CheckPasswordHash>¶</a>
+ 
+ 
+ </h2>
+ <pre>func CheckPasswordHash(password, hash <a href=http://localhost:6060/pkg/builtin/#string>string</a>) <a href=http://localhost:6060/pkg/builtin/#bool>bool</a></pre>
+ <p>
+CheckPasswordHash checks if provided password and hash are the same
+return true if hashed password have the same hash as provided hash
+return false otherwise
+</p>
+ 
+ 
+ 
+ 
+ 
+ <h2 id=HashPassword>func <a href="http://localhost:6060/src/github.com/MrKAKTyC/lets-go-chat/pkg/hasher/hasher.go?s=337:387#L3">HashPassword</a>
+ <a class="permalink sf-hidden" href=#HashPassword>¶</a>
+ 
+ 
+ </h2>
+ <pre>func HashPassword(password <a href=http://localhost:6060/pkg/builtin/#string>string</a>) (<a href=http://localhost:6060/pkg/builtin/#string>string</a>, <a href=http://localhost:6060/pkg/builtin/#error>error</a>)</pre>
+ <p>
+HashPassword hashes provided string with usage SHA256
+Error is returned if provided string is empty
+If password is not empty returned hashed password and nil
+</p>
+ 
+ 
+ 
+ 
+ 
+ 
+<div id=footer>
+Build version go1.17.2.<br>
+Except as <a href=https://developers.google.com/site-policies#restrictions>noted</a>,
+the content of this page is licensed under the
+Creative Commons Attribution 3.0 License,
+and code is licensed under a <a href=http://localhost:6060/LICENSE>BSD license</a>.<br>
+<a href=https://golang.org/doc/tos.html>Terms of Service</a> |
+<a href=https://www.google.com/intl/en/policies/privacy/>Privacy Policy</a>
+</div>
+</div>
+</div>
+<grammarly-desktop-integration data-grammarly-shadow-root=true><template shadowmode=open><style class=sf-hidden>div{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;-moz-user-select:none;-webkit-user-select:none;-ms-user-select:none;user-select:none}div:before{content:attr(data-content)}</style><div aria-label=grammarly-integration tabindex=-1 data-content='{"mode":"full","isActive":true,"isUserDisabled":false}'></div></template></grammarly-desktop-integration><script data-template-shadow-root>(()=>{document.currentScript.remove();processNode(document);function processNode(node){node.querySelectorAll("template[shadowmode]").forEach(element=>{let shadowRoot = element.parentElement.shadowRoot;if (!shadowRoot) {try {shadowRoot=element.parentElement.attachShadow({mode:element.getAttribute("shadowmode"),delegatesFocus:Boolean(element.getAttribute("delegatesfocus"))});shadowRoot.innerHTML=element.innerHTML;element.remove()} catch (error) {} if (shadowRoot) {processNode(shadowRoot)}}})}})()</script>
