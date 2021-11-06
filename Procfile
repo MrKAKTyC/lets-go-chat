@@ -1,1 +1,1 @@
-web: go run cmd/serv_messanger/main.go
+web: .\main.exe

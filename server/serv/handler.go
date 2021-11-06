@@ -2,6 +2,7 @@ package serv
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/MrKAKTyC/lets-go-chat/client"
@@ -19,6 +20,7 @@ func CreateNewRoom(connection client.Connection) {
 }
 
 func Serve(port string) {
+	fmt.Println("Running on port:", port)
 	router := mux.NewRouter()
 	router.HandleFunc("/user", createUser).Methods("POST")
 	router.HandleFunc("/user/login", getUser).Methods("POST")
