@@ -18,12 +18,12 @@ func CreateNewRoom(connection client.Connection) {
 	session.NewRoom(connection, "")
 }
 
-func Serve() {
+func Serve(port string) {
 	router := mux.NewRouter()
 	router.HandleFunc("/user", createUser).Methods("POST")
 	router.HandleFunc("/user/login", getUser).Methods("POST")
 
-	http.ListenAndServe(":80", router)
+	http.ListenAndServe(":"+port, router)
 }
 
 func createUser(w http.ResponseWriter, req *http.Request) {
