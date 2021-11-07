@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/MrKAKTyC/lets-go-chat/client"
 	"github.com/MrKAKTyC/lets-go-chat/pkg/services"
@@ -47,6 +48,8 @@ func getUser(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 	jsonResponse, _ := json.Marshal(resp)
+	w.Header().Set("X-Rate-Limit", "120")
+	w.Header().Set("X-Expires-After", time.Now().AddDate(0, 0, 1).UTC().String())
 	sendJSONResponse(w, jsonResponse)
 }
 
