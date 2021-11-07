@@ -1,1 +1,1 @@
-web: .\main.exe
+web: bin/serv_messanger
