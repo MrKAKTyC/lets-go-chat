@@ -1,5 +1,3 @@
-github.com/Morzaka/project-layout v0.0.0-20211103100051-6a23935a7fae h1:13jEfiGdAz8uXc74fGLGuHnRc1p03nUimKfKnonT+v4=
-github.com/Morzaka/project-layout v0.0.0-20211103100051-6a23935a7fae/go.mod h1:/haxaqZhYwegKUJRIPHuTkkm53+W8AWhnja9219TiII=
 github.com/google/uuid v1.3.0 h1:t6JiXgmwXMjEs8VusXIJk2BXHsn+wx8BZdTaoZ5fu7I=
 github.com/google/uuid v1.3.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
 github.com/gorilla/mux v1.8.0 h1:i40aqfkR1h2SlN9hojwV5ZA91wcXFOvkdNIeFDP5koI=

@@ -9,10 +9,10 @@ func New(login, password string) Authorization {
 	return Authorization{login, password}
 }
 
-func (auth *Authorization) Login() string {
+func (auth *Authorization) GetLogin() string {
 	return auth.login
 }
 
-func (auth *Authorization) Password() string {
+func (auth *Authorization) GetPassword() string {
 	return auth.password
 }

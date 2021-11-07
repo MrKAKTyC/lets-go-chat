@@ -34,8 +34,8 @@ func RegisterUser(user auth.CreateUserRequest) (*auth.CreateUserResponse, error)
 }
 
 func AuthorizeUser(user auth.Authorization) (string, error) {
-	userInDB, ok := userDB[user.Login()]
-	if ok && hasher.CheckPasswordHash(user.Password(), userInDB.Password) {
+	userInDB, ok := userDB[user.GetLogin()]
+	if ok && hasher.CheckPasswordHash(user.GetPassword(), userInDB.Password) {
 		return "url", nil
 	}
 	return "", errors.New("no user with such credentials")
