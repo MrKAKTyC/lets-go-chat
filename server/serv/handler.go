@@ -6,19 +6,10 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/MrKAKTyC/lets-go-chat/client"
-	"github.com/MrKAKTyC/lets-go-chat/pkg/services"
-	"github.com/MrKAKTyC/lets-go-chat/server/session"
-
 	"github.com/MrKAKTyC/lets-go-chat/client/auth"
+	"github.com/MrKAKTyC/lets-go-chat/pkg/services"
 	"github.com/gorilla/mux"
 )
-
-func CreateNewRoom(connection client.Connection) {
-
-	// if you allow creating new room than...
-	session.NewRoom(connection, "")
-}
 
 func Serve(port string) {
 	fmt.Println("Running on port:", port)
