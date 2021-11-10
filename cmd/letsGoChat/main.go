@@ -4,10 +4,13 @@ import (
 	"fmt"
 
 	hasher "github.com/MrKAKTyC/lets-go-chat/pkg/hasher"
+	"github.com/MrKAKTyC/lets-go-chat/pkg/repository"
 )
 
 func main() {
-	testHasher()
+	userRepo := repository.UserRepository()
+	println(userRepo)
+	userRepo.GetUser("MAX", "FAX")
 }
 
 func testHasher() {
