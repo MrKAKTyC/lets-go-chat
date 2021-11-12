@@ -1,18 +1,22 @@
 package auth
 
-type Authorization struct {
-	login    string
-	password string
+// LoginUserRequest defines model for LoginUserRequest.
+type LoginUserRequest struct {
+	// The password for login in clear text
+	Password string `json:"password"`
+
+	// The user name for login
+	UserName string `json:"userName"`
 }
 
-func New(login, password string) Authorization {
-	return Authorization{login, password}
+// LoginUserResonse defines model for LoginUserResonse.
+type LoginUserResonse struct {
+	// A url for websoket API with a one-time token for starting chat
+	Url string `json:"url"`
 }
 
-func (auth *Authorization) GetLogin() string {
-	return auth.login
-}
+// LoginUserJSONBody defines parameters for LoginUser.
+type LoginUserJSONBody LoginUserRequest
 
-func (auth *Authorization) GetPassword() string {
-	return auth.password
-}
+// LoginUserJSONRequestBody defines body for LoginUser for application/json ContentType.
+type LoginUserJSONRequestBody LoginUserJSONBody
