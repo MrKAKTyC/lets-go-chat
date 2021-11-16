@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/MrKAKTyC/lets-go-chat/pkg/repository"
 	userController "github.com/MrKAKTyC/lets-go-chat/pkg/server/controllers"
 	"github.com/MrKAKTyC/lets-go-chat/pkg/services"
 
@@ -13,7 +14,7 @@ import (
 func Serve(port string) {
 	fmt.Println("Running on port:", port)
 	router := echo.New()
-	server := &userController.UserController{UserService: services.New()}
+	server := &userController.UserController{UserService: services.New(repository.UserRepositoryPGS())}
 
 	RegisterHandlers(router, server)
 

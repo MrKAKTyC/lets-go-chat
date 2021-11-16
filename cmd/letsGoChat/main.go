@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	userRepo := repository.UserRepository()
+	userRepo := repository.UserRepository(repository.UserRepositoryPGS())
 	println(userRepo)
 	userRepo.GetUser("MAX", "FAX")
 }

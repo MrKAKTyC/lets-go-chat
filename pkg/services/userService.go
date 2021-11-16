@@ -4,11 +4,11 @@ import (
 	"errors"
 
 	"github.com/MrKAKTyC/lets-go-chat/client/auth"
-	"github.com/MrKAKTyC/lets-go-chat/pkg/dao"
 	"github.com/MrKAKTyC/lets-go-chat/pkg/hasher"
 	"github.com/MrKAKTyC/lets-go-chat/pkg/repository"
-	"github.com/google/uuid"
 )
+
+var url = "url"
 
 type User struct {
 	ID       string
@@ -17,12 +17,11 @@ type User struct {
 }
 
 type UserService struct {
-	storage map[string]User
-	userRepo repository.UserRepository()
+	userRepo repository.UserRepository
 }
 
-func New() UserService {
-	return UserService{make(map[string]User)}
+func New(userRepository repository.UserRepository) UserService {
+	return UserService{userRepository}
 }
 
 func (userService *UserService) RegisterUser(user auth.CreateUserRequest) (*auth.CreateUserResponse, error) {
@@ -33,28 +32,21 @@ func (userService *UserService) RegisterUser(user auth.CreateUserRequest) (*auth
 	if err != nil {
 		return nil, err
 	}
-	_, userExist := userService.storage[user.UserName]
-	if userExist {
-		return nil, errors.New("User already exists")
-	}
+	user.Password = userPassword
+	userDao := userService.userRepo.CreateUser(user.UserName, user.Password)
 
-	userUUID := uuid.New()
-	userDB[user.GetUserName()] = dao.User{userUUID, user.GetUserName(), userPassword}
-	userService.storage[user.UserName] = User{userUUID, user.UserName, userPassword}
-	return auth.NewUserResponse(userUUID, userPassword), nil
-	userUUID := uuid.New().String()
-	userService.storage[user.UserName] = User{userUUID, user.UserName, userPassword}
-
-	return &auth.CreateUserResponse{&userUUID, &userPassword}, nil
+	return &auth.CreateUserResponse{Id: &userDao.ID, UserName: &user.Password}, nil
 
 }
 
 func (userService *UserService) AuthorizeUser(user auth.LoginUserRequest) (*auth.LoginUserResonse, error) {
-	userInDB, ok := userService.storage[user.UserName]
-	userResponse := new(auth.LoginUserResonse)
-	if ok && hasher.CheckPasswordHash(user.Password, userInDB.Password) {
-		userResponse.Url = "url"
-		return userResponse, nil
-	}
-	return userResponse, errors.New("no user with such credentials")
+	userService.userRepo.GetUser(user.UserName, user.Password)
+
+	// userInDB, ok := userService.storage[user.UserName]
+	// userResponse := new(auth.LoginUserResonse)
+	// if ok && hasher.CheckPasswordHash(user.Password, userInDB.Password) {
+	// 	userResponse.Url = "url"
+	// 	return userResponse, nil
+	// }
+	return &auth.LoginUserResonse{Url: url}, errors.New("no user with such credentials")
 }
