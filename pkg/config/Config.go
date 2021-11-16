@@ -21,10 +21,3 @@ func InitConfig() Config {
 
 	return Config{db, server}
 }
-
-func LocalConfig() Config {
-	db := dbConfig{URL: "postgres://postgres:admin@127.0.0.1:5432/letsGoChat?sslmode=disable"}
-	server := serverConfig{Port: "80"}
-
-	return Config{db, server}
-}
