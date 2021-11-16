@@ -10,30 +10,51 @@ import (
 	"github.com/google/uuid"
 )
 
-var userDB = make(map[string]dao.User)
-var userRepo = repository.UserRepository()
+type User struct {
+	ID       string
+	Login    string
+	Password string
+}
 
-func RegisterUser(user auth.CreateUserRequest) (*auth.CreateUserResponse, error) {
-	if len(user.GetPassword()) < 8 || len(user.GetUserName()) < 4 {
+type UserService struct {
+	storage map[string]User
+	userRepo repository.UserRepository()
+}
+
+func New() UserService {
+	return UserService{make(map[string]User)}
+}
+
+func (userService *UserService) RegisterUser(user auth.CreateUserRequest) (*auth.CreateUserResponse, error) {
+	if len(user.Password) < 8 || len(user.UserName) < 4 {
 		return nil, errors.New("bad request, empty username or id")
 	}
-	userPassword, err := hasher.HashPassword(user.GetPassword())
+	userPassword, err := hasher.HashPassword(user.Password)
 	if err != nil {
 		return nil, err
 	}
-	_, userExist := userDB[user.GetUserName()]
+	_, userExist := userService.storage[user.UserName]
 	if userExist {
 		return nil, errors.New("User already exists")
 	}
+
 	userUUID := uuid.New()
 	userDB[user.GetUserName()] = dao.User{userUUID, user.GetUserName(), userPassword}
+	userService.storage[user.UserName] = User{userUUID, user.UserName, userPassword}
 	return auth.NewUserResponse(userUUID, userPassword), nil
+	userUUID := uuid.New().String()
+	userService.storage[user.UserName] = User{userUUID, user.UserName, userPassword}
+
+	return &auth.CreateUserResponse{&userUUID, &userPassword}, nil
+
 }
 
-func AuthorizeUser(user auth.Authorization) (string, error) {
-	userInDB, ok := userDB[user.GetLogin()]
-	if ok && hasher.CheckPasswordHash(user.GetPassword(), userInDB.Password) {
-		return "url", nil
+func (userService *UserService) AuthorizeUser(user auth.LoginUserRequest) (*auth.LoginUserResonse, error) {
+	userInDB, ok := userService.storage[user.UserName]
+	userResponse := new(auth.LoginUserResonse)
+	if ok && hasher.CheckPasswordHash(user.Password, userInDB.Password) {
+		userResponse.Url = "url"
+		return userResponse, nil
 	}
-	return "", errors.New("no user with such credentials")
+	return userResponse, errors.New("no user with such credentials")
 }

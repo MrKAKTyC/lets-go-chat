@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	serverPkg "github.com/MrKAKTyC/lets-go-chat/server/serv"
+	serverPkg "github.com/MrKAKTyC/lets-go-chat/pkg/server"
 )
 
 func main() {

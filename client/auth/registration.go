@@ -1,39 +1,19 @@
 package auth
 
-import (
-	"github.com/google/uuid"
-)
-
+// CreateUserRequest defines model for CreateUserRequest.
 type CreateUserRequest struct {
-	userName string
-	password string
+	Password string `json:"password"`
+	UserName string `json:"userName"`
 }
 
+// CreateUserResponse defines model for CreateUserResponse.
 type CreateUserResponse struct {
-	Id       uuid.UUID `json:"id"`
-	Password string    `json:"password"`
+	Id       *string `json:"id,omitempty"`
+	UserName *string `json:"userName,omitempty"`
 }
 
-func NewUserResponse(userName uuid.UUID, password string) *CreateUserResponse {
-	return &CreateUserResponse{userName, password}
-}
+// CreateUserJSONBody defines parameters for CreateUser.
+type CreateUserJSONBody CreateUserRequest
 
-func (user *CreateUserResponse) GetUserName() string {
-	return user.Password
-}
-
-func (user *CreateUserResponse) GetId() uuid.UUID {
-	return user.Id
-}
-
-func NewUserRequest(userName, password string) *CreateUserRequest {
-	return &CreateUserRequest{userName, password}
-}
-
-func (user *CreateUserRequest) GetUserName() string {
-	return user.userName
-}
-
-func (user *CreateUserRequest) GetPassword() string {
-	return user.password
-}
+// CreateUserJSONRequestBody defines body for CreateUser for application/json ContentType.
+type CreateUserJSONRequestBody CreateUserJSONBody
