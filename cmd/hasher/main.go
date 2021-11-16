@@ -3,10 +3,14 @@ package main
 import (
 	"fmt"
 
-	hasher "github.com/MrKAKTyC/lets-go-chat/pkg"
+	hasher "github.com/MrKAKTyC/lets-go-chat/pkg/hasher"
 )
 
 func main() {
+	testHasher()
+}
+
+func testHasher() {
 	password := "securePassword"
 	fmt.Println(hasher.HashPassword(password))
 	hashedPassword, _ := hasher.HashPassword(password)

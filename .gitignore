@@ -1,0 +1,31 @@
+### Go template
+# Binaries for programs and plugins
+*.exe
+*.dll
+*.so
+*.dylib
+src/src
+
+# Unignore all with extensions
+!*.*
+
+# Arhives
+*.tar
+*.zip
+
+# Test binary, build with `go test -c`
+*.test
+
+# Output of the go coverage tool
+*.out
+src/static-analysis.xml
+
+vendor/
+
+# IDEs:
+.idea/
+.vscode/
+
+# logs:
+*.log
+*.log.*
