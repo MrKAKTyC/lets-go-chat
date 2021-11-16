@@ -14,7 +14,7 @@ import (
 
 func Serve(config config.Config) {
 	router := echo.New()
-	server := &controller.User{Service: service.New(repository.UserPGS(config.DB.URL))}
+	server := &controller.User{Service: service.New(repository.UserPGS(config.DB.URL), "url")}
 
 	serv.RegisterHandlers(router, server)
 

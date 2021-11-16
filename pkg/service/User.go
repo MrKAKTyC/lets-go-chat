@@ -8,14 +8,13 @@ import (
 	"github.com/MrKAKTyC/lets-go-chat/pkg/repository"
 )
 
-var url = "url"
-
 type User struct {
 	repository repository.User
+	url        string
 }
 
-func New(userRepository repository.User) User {
-	return User{userRepository}
+func New(userRepository repository.User, authUrl string) User {
+	return User{repository: userRepository, url: authUrl}
 }
 
 func (u *User) Register(user auth.CreateUserRequest) (*auth.CreateUserResponse, error) {
@@ -45,5 +44,5 @@ func (u *User) Authorize(user auth.LoginUserRequest) (*auth.LoginUserResonse, er
 	if err != nil {
 		return nil, err
 	}
-	return &auth.LoginUserResonse{Url: url}, nil
+	return &auth.LoginUserResonse{Url: u.url}, nil
 }
