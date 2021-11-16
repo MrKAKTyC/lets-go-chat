@@ -1,4 +1,4 @@
-package userController
+package controller
 
 import (
 	"encoding/json"
@@ -6,22 +6,22 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/MrKAKTyC/lets-go-chat/client/auth"
-	"github.com/MrKAKTyC/lets-go-chat/pkg/services"
+	"github.com/MrKAKTyC/lets-go-chat/pkg/generated/auth"
+	"github.com/MrKAKTyC/lets-go-chat/pkg/service"
 	"github.com/labstack/echo/v4"
 )
 
-type UserController struct {
-	UserService services.UserService
+type User struct {
+	Service service.User
 }
 
-// CreateUser converts echo context to params.
-func (controller *UserController) CreateUser(ctx echo.Context) error {
+// Create converts echo context to params.
+func (c *User) CreateUser(ctx echo.Context) error {
 	fmt.Println("Creating user")
 	var err error
 	req := ctx.Request()
 	login, password := req.FormValue("userName"), req.FormValue("password")
-	user, err := controller.UserService.RegisterUser(auth.CreateUserRequest{Password: password, UserName: login})
+	user, err := c.Service.Register(auth.CreateUserRequest{Password: password, UserName: login})
 	if err != nil {
 		sendError(ctx.Response().Writer, err)
 		return err
@@ -35,13 +35,13 @@ func (controller *UserController) CreateUser(ctx echo.Context) error {
 	return err
 }
 
-// LoginUser converts echo context to params.
-func (controller *UserController) LoginUser(ctx echo.Context) error {
+// Login converts echo context to params.
+func (c *User) LoginUser(ctx echo.Context) error {
 	fmt.Println("Logingin user")
 	var err error
 	req := ctx.Request()
 	login, password := req.FormValue("userName"), req.FormValue("password")
-	resp, err := controller.UserService.AuthorizeUser(auth.LoginUserRequest{Password: password, UserName: login})
+	resp, err := c.Service.Authorize(auth.LoginUserRequest{Password: password, UserName: login})
 	if err != nil {
 		sendError(ctx.Response().Writer, err)
 		return err

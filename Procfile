@@ -1,1 +1,1 @@
-web: bin/serv_messanger
+web: bin/server
