@@ -3,23 +3,11 @@ package main
 import (
 	"fmt"
 
-	"github.com/MrKAKTyC/lets-go-chat/pkg/generated/auth"
 	hasher "github.com/MrKAKTyC/lets-go-chat/pkg/hasher"
-	"github.com/MrKAKTyC/lets-go-chat/pkg/repository"
-	"github.com/MrKAKTyC/lets-go-chat/pkg/service"
 )
 
 func main() {
-	repository := repository.UserPGS()
-	service := service.New(repository)
-	cur, err := service.Register(auth.CreateUserRequest{UserName: "user1", Password: "password"})
-	if err == nil {
-		fmt.Println(*cur.Id, *cur.UserName, err)
-	}
-	user, err := service.Authorize(auth.LoginUserRequest{UserName: "user2", Password: "password"})
-	if err == nil {
-		fmt.Println(user, err)
-	}
+	testHasher()
 }
 
 func testHasher() {
