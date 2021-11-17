@@ -16,7 +16,6 @@ type User struct {
 
 // Create converts echo context to params.
 func (c *User) CreateUser(ctx echo.Context) error {
-	var err error
 	req := ctx.Request()
 	login, password := req.FormValue("userName"), req.FormValue("password")
 	user, err := c.Service.Register(auth.CreateUserRequest{Password: password, UserName: login})

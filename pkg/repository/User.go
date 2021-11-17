@@ -30,9 +30,9 @@ func UserPGS(dbUrl string) *userPGS {
 	return &userPGS{db: *db}
 }
 
-func (repo userPGS) Get(login, password string) (*dao.User, error) {
+func (r userPGS) Get(login, password string) (*dao.User, error) {
 	user := dao.User{}
-	err := repo.db.QueryRow("SELECT * FROM users WHERE username LIKE $1 AND password LIKE $2", login, password).Scan(&user.ID, &user.Login, &user.Password)
+	err := r.db.QueryRow("SELECT * FROM users WHERE username LIKE $1 AND password LIKE $2", login, password).Scan(&user.ID, &user.Login, &user.Password)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Query failed: %v\n", err)
 		return nil, err
