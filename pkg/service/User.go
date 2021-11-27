@@ -3,17 +3,22 @@ package service
 import (
 	"errors"
 
+	"github.com/MrKAKTyC/lets-go-chat/pkg/dao"
 	"github.com/MrKAKTyC/lets-go-chat/pkg/generated/auth"
 	"github.com/MrKAKTyC/lets-go-chat/pkg/hasher"
-	"github.com/MrKAKTyC/lets-go-chat/pkg/repository"
 )
 
+type UserRepository interface {
+	Get(login, password string) (*dao.User, error)
+	Create(login, password string) (*dao.User, error)
+}
+
 type User struct {
-	repository repository.User
+	repository UserRepository
 	url        string
 }
 
-func New(userRepository repository.User, authUrl string) User {
+func New(userRepository UserRepository, authUrl string) User {
 	return User{repository: userRepository, url: authUrl}
 }
 

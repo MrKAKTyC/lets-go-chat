@@ -11,11 +11,6 @@ import (
 	_ "github.com/lib/pq"
 )
 
-type User interface {
-	Get(login, password string) (*dao.User, error)
-	Create(login, password string) (*dao.User, error)
-}
-
 type userPGS struct {
 	db sql.DB
 }
