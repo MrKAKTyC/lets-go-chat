@@ -6,19 +6,22 @@ import (
 	"time"
 
 	"github.com/MrKAKTyC/lets-go-chat/pkg/generated/auth"
+	"github.com/MrKAKTyC/lets-go-chat/pkg/generated/types"
+	"github.com/MrKAKTyC/lets-go-chat/pkg/server/websocket"
 	"github.com/MrKAKTyC/lets-go-chat/pkg/service"
 	"github.com/labstack/echo/v4"
 )
 
 type User struct {
-	Service service.User
+	UserService service.User
+	ChatRoom    websocket.ChatRoom
 }
 
 // Create converts echo context to params.
 func (c *User) CreateUser(ctx echo.Context) error {
 	req := ctx.Request()
 	login, password := req.FormValue("userName"), req.FormValue("password")
-	user, err := c.Service.Register(auth.CreateUserRequest{Password: password, UserName: login})
+	user, err := c.UserService.Register(auth.CreateUserRequest{Password: password, UserName: login})
 	if err != nil {
 		sendError(ctx.Response().Writer, err)
 		return err
@@ -37,7 +40,7 @@ func (c *User) LoginUser(ctx echo.Context) error {
 	var err error
 	req := ctx.Request()
 	login, password := req.FormValue("userName"), req.FormValue("password")
-	resp, err := c.Service.Authorize(auth.LoginUserRequest{Password: password, UserName: login})
+	resp, err := c.UserService.Authorize(auth.LoginUserRequest{Password: password, UserName: login})
 	if err != nil {
 		sendError(ctx.Response().Writer, err)
 		return err
@@ -46,6 +49,18 @@ func (c *User) LoginUser(ctx echo.Context) error {
 	ctx.Response().Header().Set("X-Rate-Limit", "120")
 	ctx.Response().Header().Set("X-Expires-After", time.Now().AddDate(0, 0, 1).UTC().String())
 	sendJSONResponse(ctx.Response().Writer, jsonUser)
+	return err
+}
+
+func (c *User) GetActiveUsers(ctx echo.Context) error {
+	activeUsers, _ := json.Marshal(c.ChatRoom.GetActiveUsers())
+	sendJSONResponse(ctx.Response().Writer, activeUsers)
+	return nil
+}
+
+func (c *User) WsRTMStart(ctx echo.Context, params types.WsRTMStartParams) error {
+	err := websocket.ServeWs(&c.ChatRoom, ctx, params)
+	sendError(ctx.Response().Writer, err)
 	return err
 }
 

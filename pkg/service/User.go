@@ -15,11 +15,16 @@ type UserRepository interface {
 
 type User struct {
 	repository UserRepository
+	otpService OtpService
 	url        string
 }
 
-func New(userRepository UserRepository, authUrl string) User {
-	return User{repository: userRepository, url: authUrl}
+func NewUserService(userRepository UserRepository, otpService OtpService, authUrl string) User {
+	return User{
+		repository: userRepository,
+		otpService: otpService,
+		url:        authUrl,
+	}
 }
 
 func (u *User) Register(user auth.CreateUserRequest) (*auth.CreateUserResponse, error) {
@@ -49,5 +54,5 @@ func (u *User) Authorize(user auth.LoginUserRequest) (*auth.LoginUserResonse, er
 	if err != nil {
 		return nil, err
 	}
-	return &auth.LoginUserResonse{Url: u.url}, nil
+	return &auth.LoginUserResonse{Url: u.url + u.otpService.GenerateOTP()}, nil
 }
