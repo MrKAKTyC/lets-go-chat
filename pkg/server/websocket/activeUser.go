@@ -9,16 +9,9 @@ import (
 )
 
 const (
-	// Time allowed to write a message to the peer.
-	writeWait = 10 * time.Second
-
-	// Time allowed to read the next pong message from the peer.
-	pongWait = 60 * time.Second
-
-	// Send pings to peer with this period. Must be less than pongWait.
-	pingPeriod = (pongWait * 9) / 10
-
-	// Maximum message size allowed from peer.
+	writeWait      = 10 * time.Second
+	pongWait       = 60 * time.Second
+	pingPeriod     = (pongWait * 9) / 10
 	maxMessageSize = 512
 )
 
@@ -32,15 +25,10 @@ var upgrader = websocket.Upgrader{
 	WriteBufferSize: 1024,
 }
 
-// Client is a middleman between the websocket connection and the hub.
 type ActiveUser struct {
 	chatRoom *ChatRoom
-
-	// The websocket connection.
-	conn *websocket.Conn
-
-	// Buffered channel of outbound messages.
-	send chan []byte
+	conn     *websocket.Conn
+	send     chan []byte
 }
 
 func (au *ActiveUser) ReadMessage() {
@@ -75,7 +63,6 @@ func (au *ActiveUser) WriteMessage() {
 		case message, ok := <-au.send:
 			au.conn.SetWriteDeadline(time.Now().Add(writeWait))
 			if !ok {
-				// The hub closed the channel.
 				au.conn.WriteMessage(websocket.CloseMessage, []byte{})
 				return
 			}
@@ -85,8 +72,6 @@ func (au *ActiveUser) WriteMessage() {
 				return
 			}
 			w.Write(message)
-
-			// Add queued chat messages to the current websocket message.
 			n := len(au.send)
 			for i := 0; i < n; i++ {
 				w.Write(newline)
