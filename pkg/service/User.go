@@ -13,14 +13,19 @@ type UserRepository interface {
 	Create(login, password string) (*dao.User, error)
 }
 
+type OTPService interface {
+	GenerateOTP() string
+	UseOTP(otpToUse string) error
+}
+
 type User struct {
 	repository UserRepository
-	otpService OtpService
+	otpService OTPService
 	url        string
 }
 
-func NewUserService(userRepository UserRepository, otpService OtpService, authUrl string) User {
-	return User{
+func NewUserService(userRepository UserRepository, otpService OTPService, authUrl string) *User {
+	return &User{
 		repository: userRepository,
 		otpService: otpService,
 		url:        authUrl,
@@ -37,14 +42,14 @@ func (u *User) Register(user auth.CreateUserRequest) (*auth.CreateUserResponse, 
 	}
 	user.Password = userPassword
 	userDao, err := u.repository.Create(user.UserName, user.Password)
-	if userDao == nil {
+	if err != nil {
 		return nil, err
 	}
 	return &auth.CreateUserResponse{Id: &userDao.ID, UserName: &user.UserName}, nil
 
 }
 
-func (u *User) Authorize(user auth.LoginUserRequest) (*auth.LoginUserResonse, error) {
+func (u *User) Authorize(user auth.LoginUserRequest) (*auth.LoginUserResponse, error) {
 	userPassword, err := hasher.HashPassword(user.Password)
 	if err != nil {
 		return nil, err
@@ -54,5 +59,5 @@ func (u *User) Authorize(user auth.LoginUserRequest) (*auth.LoginUserResonse, er
 	if err != nil {
 		return nil, err
 	}
-	return &auth.LoginUserResonse{Url: u.url + u.otpService.GenerateOTP()}, nil
+	return &auth.LoginUserResponse{Url: u.url + u.otpService.GenerateOTP()}, nil
 }

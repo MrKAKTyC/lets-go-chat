@@ -8,13 +8,24 @@ import (
 	"github.com/MrKAKTyC/lets-go-chat/pkg/generated/auth"
 	"github.com/MrKAKTyC/lets-go-chat/pkg/generated/types"
 	"github.com/MrKAKTyC/lets-go-chat/pkg/server/websocket"
-	"github.com/MrKAKTyC/lets-go-chat/pkg/service"
 	"github.com/labstack/echo/v4"
 )
 
+type UserService interface {
+	Register(user auth.CreateUserRequest) (*auth.CreateUserResponse, error)
+	Authorize(user auth.LoginUserRequest) (*auth.LoginUserResponse, error)
+}
+
+type ChatRoom interface {
+	Run()
+	GetActiveUsers() int
+	Join(activeUser *websocket.ActiveUser) error
+	ServeWs(ctx echo.Context, params types.WsRTMStartParams) error
+}
+
 type User struct {
-	UserService service.User
-	ChatRoom    websocket.ChatRoom
+	UserService UserService
+	ChatRoom    ChatRoom
 }
 
 // Create converts echo context to params.
@@ -59,8 +70,10 @@ func (c *User) GetActiveUsers(ctx echo.Context) error {
 }
 
 func (c *User) WsRTMStart(ctx echo.Context, params types.WsRTMStartParams) error {
-	err := websocket.ServeWs(&c.ChatRoom, ctx, params)
-	sendError(ctx.Response().Writer, err)
+	err := c.ChatRoom.ServeWs(ctx, params)
+	if err != nil {
+		sendError(ctx.Response().Writer, err)
+	}
 	return err
 }
 

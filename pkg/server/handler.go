@@ -22,7 +22,7 @@ func Serve(config config.Config) {
 	userService := service.NewUserService(userRepository, otpService, "/chat/ws.rtm.start?token=")
 
 	go chatRoom.Run()
-	server := &controller.User{UserService: userService, ChatRoom: *chatRoom}
+	server := &controller.User{UserService: userService, ChatRoom: chatRoom}
 
 	serv.RegisterHandlers(router, server)
 	handlerChain := middleware.PanicRecoverer(middleware.ErrorLogger(middleware.RequestLogger(router)))
