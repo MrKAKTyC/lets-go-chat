@@ -32,7 +32,7 @@ func (u *User) Register(user auth.CreateUserRequest) (*auth.CreateUserResponse, 
 	}
 	user.Password = userPassword
 	userDao, err := u.repository.Create(user.UserName, user.Password)
-	if userDao == nil {
+	if err == nil {
 		return nil, err
 	}
 	return &auth.CreateUserResponse{Id: &userDao.ID, UserName: &user.UserName}, nil
