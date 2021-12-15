@@ -1,6 +1,9 @@
 package hasher
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+)
 
 var (
 	testPassword       = "qwerty"
@@ -37,7 +40,7 @@ func TestCheckPasswordHash_CorrectHash(t *testing.T) {
 func TestCheckPasswordHash_WrongHash(t *testing.T) {
 	t.Parallel()
 	if CheckPasswordHash(testPassword, "incorrect password hash") {
-		t.Error("Must be false for ncorrect password hash")
+		t.Error("Must be false for incorrect password hash")
 	}
 }
 
@@ -45,5 +48,27 @@ func TestCheckPasswordHash_IllegalPassword(t *testing.T) {
 	t.Parallel()
 	if CheckPasswordHash(zeroLengthPassword, testPasswordHash) {
 		t.Error("Must be false for zero length password")
+	}
+}
+
+func ExampleHashPassword() {
+	fmt.Println(HashPassword("qwerty"))
+	// Output: 65e84be33532fb784c48129675f9eff3a682b27168c0ea744b2cf58ee02337c5 <nil>
+}
+
+func ExampleCheckPasswordHash() {
+	fmt.Println(CheckPasswordHash("qwerty", "65e84be33532fb784c48129675f9eff3a682b27168c0ea744b2cf58ee02337c5"))
+	// Output: true
+}
+
+func BenchmarkHashPassword(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		HashPassword(testPassword)
+	}
+}
+
+func BenchmarkCheckPasswordHash(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		CheckPasswordHash(testPassword, testPasswordHash)
 	}
 }
