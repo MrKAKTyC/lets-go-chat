@@ -16,9 +16,16 @@ import (
 
 func Serve(config config.Config) {
 	router := echo.New()
-	userRepository := repository.UserPGS(config.DB.URL)
+	dbConnection, err := repository.GetDBConnection(config.DB.URL)
+	if err != nil {
+		return
+	}
+	defer dbConnection.Close()
+	userRepository := repository.UserPGS(dbConnection)
+	messageRepository := repository.MessagePGS(dbConnection)
 	otpService := service.NewOtpService()
-	chatRoom := websocket.NewChatRoom(otpService)
+
+	chatRoom := websocket.NewChatRoom(otpService, messageRepository, userRepository)
 	userService := service.NewUserService(userRepository, otpService, "/chat/ws.rtm.start?token=")
 
 	go chatRoom.Run()

@@ -14,8 +14,8 @@ type UserRepository interface {
 }
 
 type OTPService interface {
-	GenerateOTP() string
-	UseOTP(otpToUse string) error
+	GenerateOTP(userId string) string
+	UseOTP(otpToUse string) (string, error)
 }
 
 type User struct {
@@ -55,9 +55,9 @@ func (u *User) Authorize(user auth.LoginUserRequest) (*auth.LoginUserResponse, e
 		return nil, err
 	}
 	user.Password = userPassword
-	_, err = u.repository.Get(user.UserName, user.Password)
+	userDAO, err := u.repository.Get(user.UserName, user.Password)
 	if err != nil {
 		return nil, err
 	}
-	return &auth.LoginUserResponse{Url: u.url + u.otpService.GenerateOTP()}, nil
+	return &auth.LoginUserResponse{Url: u.url + u.otpService.GenerateOTP(userDAO.ID)}, nil
 }

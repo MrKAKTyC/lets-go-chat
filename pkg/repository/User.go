@@ -2,9 +2,8 @@ package repository
 
 import (
 	"database/sql"
-	"fmt"
 	"log"
-	"os"
+	"time"
 
 	"github.com/MrKAKTyC/lets-go-chat/pkg/dao"
 	"github.com/google/uuid"
@@ -12,24 +11,18 @@ import (
 )
 
 type userPGS struct {
-	db sql.DB
+	db *sql.DB
 }
 
-func UserPGS(dbUrl string) *userPGS {
-	db, err := sql.Open("postgres", dbUrl)
-	if err != nil {
-		log.Fatal(err)
-	} else {
-		log.Println("Connection to", dbUrl, "established")
-	}
-	return &userPGS{db: *db}
+func UserPGS(db *sql.DB) *userPGS {
+	return &userPGS{db: db}
 }
 
-func (r userPGS) Get(login, password string) (*dao.User, error) {
+func (repo userPGS) Get(login, password string) (*dao.User, error) {
 	user := dao.User{}
-	err := r.db.QueryRow("SELECT * FROM users WHERE username LIKE $1 AND password LIKE $2", login, password).Scan(&user.ID, &user.Login, &user.Password)
+	err := repo.db.QueryRow("SELECT id, username, password FROM users WHERE username LIKE $1 AND password LIKE $2", login, password).Scan(&user.ID, &user.Login, &user.Password)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Query failed: %v\n", err)
+		log.Printf("UserPGS::Get Query failed: %v\n", err)
 		return nil, err
 	}
 
@@ -40,9 +33,26 @@ func (repo userPGS) Create(login, password string) (*dao.User, error) {
 	userUUID := uuid.New().String()
 	_, err := repo.db.Exec("INSERT INTO users (id, username, password) VALUES ($1, $2, $3)", userUUID, login, password)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Query failed: %v\n", err)
+		log.Printf("UserPGS::Create Query failed: %v\n", err)
 		return nil, err
 	}
 
 	return &dao.User{ID: userUUID, Login: login}, nil
+}
+
+func (repo userPGS) GetLastOnline(userID string) (*time.Time, error) {
+	var stringTime string
+	err := repo.db.QueryRow("SELECT to_char(lastonline, 'YYYY-MM-DD HH24:MI:SS') FROM users WHERE id::text LIKE $1", userID).Scan(&stringTime)
+	if err != nil {
+		log.Printf("UserPGS::GetLastOnline Query failed: %v\n", err)
+		return nil, err
+	}
+
+	lastOnline, err := time.Parse("2006-01-02 15:04:05", stringTime)
+	return &lastOnline, err
+}
+
+func (repo userPGS) UpdateLastOnline(userID string, logoutDate time.Time) error {
+	_, err := repo.db.Exec("UPDATE users SET lastonline = $1 WHERE id::text LIKE $2", logoutDate, userID)
+	return err
 }
