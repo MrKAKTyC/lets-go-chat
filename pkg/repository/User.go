@@ -41,15 +41,13 @@ func (repo userPGS) Create(login, password string) (*dao.User, error) {
 }
 
 func (repo userPGS) GetLastOnline(userID string) (*time.Time, error) {
-	var stringTime string
-	err := repo.db.QueryRow("SELECT to_char(lastonline, 'YYYY-MM-DD HH24:MI:SS') FROM users WHERE id::text LIKE $1", userID).Scan(&stringTime)
+	lastOnline := new(time.Time)
+	err := repo.db.QueryRow("SELECT lastonline FROM users WHERE id::text LIKE $1", userID).Scan(lastOnline)
 	if err != nil {
 		log.Printf("UserPGS::GetLastOnline Query failed: %v\n", err)
 		return nil, err
 	}
-
-	lastOnline, err := time.Parse("2006-01-02 15:04:05", stringTime)
-	return &lastOnline, err
+	return lastOnline, err
 }
 
 func (repo userPGS) UpdateLastOnline(userID string, logoutDate time.Time) error {
