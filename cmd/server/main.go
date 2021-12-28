@@ -1,16 +1,11 @@
 package main
 
 import (
-	"os"
-
-	serverPkg "github.com/MrKAKTyC/lets-go-chat/pkg/server"
+	"github.com/MrKAKTyC/lets-go-chat/pkg/config"
+	serv "github.com/MrKAKTyC/lets-go-chat/pkg/server"
 )
 
 func main() {
-	port := os.Getenv("PORT")
-
-	if port == "" {
-		port = "80"
-	}
-	serverPkg.Serve(port)
+	config := config.InitConfig()
+	serv.Serve(config)
 }

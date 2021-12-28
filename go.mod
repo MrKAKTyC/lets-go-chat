@@ -5,6 +5,7 @@ go 1.17
 require (
 	github.com/google/uuid v1.3.0
 	github.com/labstack/echo/v4 v4.6.1
+	github.com/lib/pq v1.10.2
 )
 
 require (
@@ -17,5 +18,9 @@ require (
 	golang.org/x/net v0.0.0-20210913180222-943fd674d43e // indirect
 	golang.org/x/sys v0.0.0-20210910150752-751e447fb3d0 // indirect
 	golang.org/x/text v0.3.7 // indirect
-	gopkg.in/yaml.v2 v2.3.0 // indirect
+)
+
+require (
+	github.com/davecgh/go-spew v1.1.1 // indirect
+	github.com/stretchr/testify v1.7.0 // indirect
 )

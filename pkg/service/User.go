@@ -6,15 +6,20 @@ import (
 	"github.com/MrKAKTyC/lets-go-chat/pkg/dao"
 	"github.com/MrKAKTyC/lets-go-chat/pkg/generated/auth"
 	"github.com/MrKAKTyC/lets-go-chat/pkg/hasher"
-	"github.com/google/uuid"
 )
 
-type User struct {
-	storage map[string]dao.User
+type UserRepository interface {
+	Get(login, password string) (*dao.User, error)
+	Create(login, password string) (*dao.User, error)
 }
 
-func New() User {
-	return User{make(map[string]dao.User)}
+type User struct {
+	repository UserRepository
+	url        string
+}
+
+func New(userRepository UserRepository, authUrl string) User {
+	return User{repository: userRepository, url: authUrl}
 }
 
 func (u *User) Register(user auth.CreateUserRequest) (*auth.CreateUserResponse, error) {
@@ -25,22 +30,24 @@ func (u *User) Register(user auth.CreateUserRequest) (*auth.CreateUserResponse, 
 	if err != nil {
 		return nil, err
 	}
-	_, userExist := u.storage[user.UserName]
-	if userExist {
-		return nil, errors.New("User already exists")
+	user.Password = userPassword
+	userDao, err := u.repository.Create(user.UserName, user.Password)
+	if err == nil {
+		return nil, err
 	}
-	userUUID := uuid.New().String()
-	u.storage[user.UserName] = dao.User{ID: userUUID, Login: user.UserName, Password: userPassword}
+	return &auth.CreateUserResponse{Id: &userDao.ID, UserName: &user.UserName}, nil
 
-	return &auth.CreateUserResponse{Id: &userUUID, UserName: &user.UserName}, nil
 }
 
-func (userService *User) Authorize(user auth.LoginUserRequest) (*auth.LoginUserResonse, error) {
-	userInDB, ok := userService.storage[user.UserName]
-	userResponse := new(auth.LoginUserResonse)
-	if ok && hasher.CheckPasswordHash(user.Password, userInDB.Password) {
-		userResponse.Url = "url"
-		return userResponse, nil
+func (u *User) Authorize(user auth.LoginUserRequest) (*auth.LoginUserResonse, error) {
+	userPassword, err := hasher.HashPassword(user.Password)
+	if err != nil {
+		return nil, err
 	}
-	return userResponse, errors.New("no user with such credentials")
+	user.Password = userPassword
+	_, err = u.repository.Get(user.UserName, user.Password)
+	if err != nil {
+		return nil, err
+	}
+	return &auth.LoginUserResonse{Url: u.url}, nil
 }
