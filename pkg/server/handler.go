@@ -1,6 +1,7 @@
 package serv
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/MrKAKTyC/lets-go-chat/pkg/config"
@@ -22,10 +23,14 @@ func Serve(config config.Config) {
 	userService := service.NewUserService(userRepository, otpService, "/chat/ws.rtm.start?token=")
 
 	go chatRoom.Run()
-	server := &controller.User{UserService: userService, ChatRoom: chatRoom}
+	userController := controller.NewUser(userService, *chatRoom)
 
-	serv.RegisterHandlers(router, server)
-	handlerChain := middleware.PanicRecoverer(middleware.ErrorLogger(middleware.RequestLogger(router)))
+	router.Use(middleware.PanicRecoverer)
+	router.Use(middleware.ErrorLogger)
+	router.Use(middleware.RequestLogger)
+	serv.RegisterHandlers(router, userController)
 
-	http.ListenAndServe(":"+config.Server.Port, handlerChain)
+	if err := http.ListenAndServe(":"+config.Server.Port, router); err != nil {
+		log.Println(err)
+	}
 }
