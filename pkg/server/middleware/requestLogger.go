@@ -1,13 +1,14 @@
 package middleware
 
 import (
+	"github.com/labstack/echo/v4"
 	"log"
-	"net/http"
 )
 
-func RequestLogger(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		log.Println(r.Method + " " + r.URL.String())
-		next.ServeHTTP(w, r)
-	})
+func RequestLogger(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(context echo.Context) error {
+		request := context.Request()
+		log.Println(request.Method + " " + request.URL.String())
+		return next(context)
+	}
 }

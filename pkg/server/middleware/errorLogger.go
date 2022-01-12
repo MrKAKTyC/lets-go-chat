@@ -2,17 +2,16 @@ package middleware
 
 import (
 	"bytes"
+	"github.com/go-chi/chi/v5/middleware"
+	"github.com/labstack/echo/v4"
 	"io"
 	"io/ioutil"
 	"log"
-	"net/http"
-
-	"github.com/go-chi/chi/v5/middleware"
 )
 
-func ErrorLogger(next http.Handler) http.Handler {
-	fn := func(w http.ResponseWriter, r *http.Request) {
-		ww := middleware.NewWrapResponseWriter(w, r.ProtoMajor)
+func ErrorLogger(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(context echo.Context) error {
+		ww := middleware.NewWrapResponseWriter(context.Response().Writer, context.Request().ProtoMajor)
 
 		buf := newLimitBuffer(512)
 		ww.Tee(buf)
@@ -25,10 +24,8 @@ func ErrorLogger(next http.Handler) http.Handler {
 			respBody, _ := ioutil.ReadAll(buf)
 			log.Println(string(respBody))
 		}()
-
-		next.ServeHTTP(ww, r)
+		return next(context)
 	}
-	return http.HandlerFunc(fn)
 }
 
 type limitBuffer struct {
