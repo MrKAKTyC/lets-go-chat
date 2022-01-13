@@ -1,6 +1,8 @@
 package serv
 
 import (
+	"database/sql"
+	log2 "github.com/labstack/gommon/log"
 	"log"
 	"net/http"
 
@@ -21,10 +23,15 @@ func Serve(config config.Config) {
 	if err != nil {
 		return
 	}
-	defer dbConnection.Close()
+	defer func(dbConnection *sql.DB) {
+		err := dbConnection.Close()
+		if err != nil {
+			log2.Print(err)
+		}
+	}(dbConnection)
 	userRepository := repository.UserPGS(dbConnection)
 	messageRepository := repository.MessagePGS(dbConnection)
-	otpService := service.NewOtpService()
+	otpService := service.NewOtp(make(map[string]string))
 
 	chatRoom := websocket.NewChatRoom(otpService, messageRepository, userRepository)
 	userService := service.NewUserService(userRepository, otpService, "/chat/ws.rtm.start?token=")
