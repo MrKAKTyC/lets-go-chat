@@ -2,6 +2,7 @@ package controller
 
 import (
 	"encoding/json"
+	"github.com/MrKAKTyC/lets-go-chat/pkg/service"
 	"log"
 	"net/http"
 	"time"
@@ -31,8 +32,8 @@ type User struct {
 
 func NewUser(userService service.User, chatRoom websocket.ChatRoom) *User {
 	return &User{
-		UserService: userService,
-		ChatRoom:    chatRoom,
+		UserService: &userService,
+		ChatRoom:    &chatRoom,
 	}
 }
 

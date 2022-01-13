@@ -2,17 +2,45 @@ package controller
 
 import (
 	"errors"
+	"github.com/MrKAKTyC/lets-go-chat/pkg/controller/mocks"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
 
-	"github.com/MrKAKTyC/lets-go-chat/pkg/controller/mocks"
 	"github.com/MrKAKTyC/lets-go-chat/pkg/generated/auth"
 	"github.com/MrKAKTyC/lets-go-chat/pkg/generated/types"
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/mock"
 )
+
+var id, name, serviceError = "uid", "name", errors.New("service fail")
+
+var testRegister = []struct {
+	userResponse *auth.CreateUserResponse
+	err          error
+	expected     error
+}{
+	{&auth.CreateUserResponse{Id: &id, UserName: &name}, nil, nil}, //Happy pass
+	{nil, serviceError, serviceError},                              //Service fail
+}
+
+var testLogin = []struct {
+	userResponse *auth.LoginUserResponse
+	err          error
+	expected     error
+}{
+	{&auth.LoginUserResponse{Url: "url"}, nil, nil}, //Happy pass
+	{nil, serviceError, serviceError},               //Service fail
+}
+
+var testWebSocket = []struct {
+	err      error
+	expected error
+}{
+	{nil, nil},                   //Happy pass
+	{serviceError, serviceError}, //Service fail
+}
 
 func initController() (*User, *mocks.UserService, *mocks.ChatRoom) {
 	us := &mocks.UserService{}
@@ -32,42 +60,29 @@ func initContext() echo.Context {
 }
 
 func TestCreateUser(t *testing.T) {
-	userController, us, _ := initController()
 	c := initContext()
 
-	id, name := "uid", "name"
-	LURes := &auth.CreateUserResponse{Id: &id, UserName: &name}
-	us.On("Register", mock.Anything).Return(LURes, nil)
-	err := userController.CreateUser(c)
-	if err != nil {
-		t.Error("No error is expected", err)
-	}
-
-	userController, us, _ = initController()
-	us.On("Register", mock.Anything).Return(nil, errors.New("Service fail"))
-	err = userController.CreateUser(c)
-	if err == nil {
-		t.Error("Error is expected")
+	for _, testCase := range testRegister {
+		userController, us, _ := initController()
+		us.On("Register", mock.Anything).Return(testCase.userResponse, testCase.err)
+		err := userController.CreateUser(c)
+		if err != testCase.expected {
+			t.Errorf("Unexpected result. For %s was expected %s, but get %s", testCase.err, testCase.expected, err)
+		}
 	}
 
 }
 
 func TestLoginUser(t *testing.T) {
-	userController, us, _ := initController()
 	c := initContext()
 
-	LURes := &auth.LoginUserResponse{Url: "url"}
-	us.On("Authorize", mock.Anything).Return(LURes, nil)
-	err := userController.LoginUser(c)
-	if err != nil {
-		t.Error("No error is expected", err)
-	}
-
-	userController, us, _ = initController()
-	us.On("Authorize", mock.Anything).Return(nil, errors.New("Service fail"))
-	err = userController.LoginUser(c)
-	if err == nil {
-		t.Error("Error is expected")
+	for _, testCase := range testLogin {
+		userController, us, _ := initController()
+		us.On("Authorize", mock.Anything).Return(testCase.userResponse, testCase.err)
+		err := userController.LoginUser(c)
+		if err != testCase.expected {
+			t.Errorf("Unexpected result. For %s was expected %s, but get %s", testCase.err, testCase.expected, err)
+		}
 	}
 }
 
@@ -77,28 +92,22 @@ func TestGetActiveUsers(t *testing.T) {
 
 	cr.On("GetActiveUsers").Return(10)
 	err := userController.GetActiveUsers(c)
-
 	if err != nil {
 		t.Error("No error is expected", err)
 	}
 }
 
 func TestWsRTMStart(t *testing.T) {
-	userController, _, cr := initController()
 	c := initContext()
 
 	params := types.WsRTMStartParams{}
-	cr.On("ServeWs", mock.Anything, mock.Anything).Return(nil)
-	err := userController.WsRTMStart(c, params)
-	if err != nil {
-		t.Error("No error expected", err)
-	}
-
-	userController, _, cr = initController()
-	cr.On("ServeWs", mock.Anything, mock.Anything).Return(errors.New("Service fail"))
-	err = userController.WsRTMStart(c, params)
-	if err == nil {
-		t.Error("Error is expected")
+	for _, testCase := range testWebSocket {
+		userController, _, cr := initController()
+		cr.On("ServeWs", mock.Anything, mock.Anything).Return(testCase.err)
+		err := userController.WsRTMStart(c, params)
+		if err != testCase.expected {
+			t.Errorf("Unexpected result. For %s was expected %s, but get %s", testCase.err, testCase.expected, err)
+		}
 	}
 
 }

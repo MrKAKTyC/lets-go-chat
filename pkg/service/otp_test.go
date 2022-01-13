@@ -7,7 +7,7 @@ import (
 
 func TestGenerateOTP(t *testing.T) {
 	storage := make(map[string]time.Time)
-	otp := newOtpService(storage)
+	otp := NewOtpService(storage)
 	otp.GenerateOTP()
 	if len(storage) != 1 {
 		t.Error("Storage should contain generated OTP")
@@ -16,7 +16,7 @@ func TestGenerateOTP(t *testing.T) {
 
 func TestUseOTP(t *testing.T) {
 	storage := make(map[string]time.Time)
-	otpService := newOtpService(storage)
+	otpService := NewOtpService(storage)
 
 	otp := otpService.GenerateOTP()
 	err := otpService.UseOTP(otp)
