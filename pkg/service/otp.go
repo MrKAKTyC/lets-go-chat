@@ -15,10 +15,6 @@ func newOtpService(storage map[string]string) OtpService {
 	return OtpService{otpStorage: storage}
 }
 
-func NewOtpService() *OtpService {
-	return &OtpService{otpStorage: make(map[string]string)}
-}
-
 func (s *OtpService) GenerateOTP(userId string) string {
 	rand.Seed(time.Now().Unix())
 	otpInt := rand.Int31()

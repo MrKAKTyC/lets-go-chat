@@ -4,12 +4,12 @@ import (
 	"testing"
 )
 
-var DBuserID = "UUID-ID"
+var dBuserID = "UUID-ID"
 
 func TestGenerateOTP(t *testing.T) {
 	storage := make(map[string]string)
-	otp := newOtpService(storage)
-	otp.GenerateOTP(DBuserID)
+	otp := NewOtpService(storage)
+	otp.GenerateOTP(dBuserID)
 	if len(storage) != 1 {
 		t.Error("Storage should contain generated OTP")
 	}
@@ -17,14 +17,14 @@ func TestGenerateOTP(t *testing.T) {
 
 func TestUseOTP(t *testing.T) {
 	storage := make(map[string]string)
-	otpService := newOtpService(storage)
+	otpService := NewOtpService(storage)
 
-	otp := otpService.GenerateOTP(DBuserID)
+	otp := otpService.GenerateOTP(dBuserID)
 	userID, err := otpService.UseOTP(otp)
 	if err != nil {
 		t.Error("OTP should be extractable")
 	}
-	if DBuserID != userID {
+	if dBuserID != userID {
 		t.Error("ID after extraction should be same as placed", DBuserID, userID)
 	}
 }

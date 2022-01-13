@@ -1,17 +1,17 @@
 package middleware
 
 import (
+	"github.com/labstack/echo/v4"
 	"log"
-	"net/http"
 )
 
-func PanicRecoverer(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+func PanicRecoverer(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(context echo.Context) error {
 		defer func() {
 			if recoveryMessage := recover(); recoveryMessage != nil {
 				log.Println(recoveryMessage)
 			}
 		}()
-		next.ServeHTTP(w, r)
-	})
+		return next(context)
+	}
 }

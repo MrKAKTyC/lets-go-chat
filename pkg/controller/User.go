@@ -2,6 +2,8 @@ package controller
 
 import (
 	"encoding/json"
+	"github.com/MrKAKTyC/lets-go-chat/pkg/service"
+	"log"
 	"net/http"
 	"time"
 
@@ -29,6 +31,13 @@ type User struct {
 	ChatRoom    ChatRoom
 }
 
+func NewUser(userService service.User, chatRoom websocket.ChatRoom) *User {
+	return &User{
+		UserService: &userService,
+		ChatRoom:    &chatRoom,
+	}
+}
+
 // Create converts echo context to params.
 func (c *User) CreateUser(ctx echo.Context) error {
 	req := ctx.Request()
@@ -49,7 +58,6 @@ func (c *User) CreateUser(ctx echo.Context) error {
 
 // Login converts echo context to params.
 func (c *User) LoginUser(ctx echo.Context) error {
-	var err error
 	req := ctx.Request()
 	login, password := req.FormValue("userName"), req.FormValue("password")
 	resp, err := c.UserService.Authorize(auth.LoginUserRequest{Password: password, UserName: login})
@@ -65,9 +73,9 @@ func (c *User) LoginUser(ctx echo.Context) error {
 }
 
 func (c *User) GetActiveUsers(ctx echo.Context) error {
-	activeUsers, _ := json.Marshal(c.ChatRoom.GetActiveUsers())
+	activeUsers, err := json.Marshal(c.ChatRoom.GetActiveUsers())
 	sendJSONResponse(ctx.Response().Writer, activeUsers)
-	return nil
+	return err
 }
 
 func (c *User) WsRTMStart(ctx echo.Context, params types.WsRTMStartParams) error {
@@ -80,11 +88,17 @@ func (c *User) WsRTMStart(ctx echo.Context, params types.WsRTMStartParams) error
 
 func sendError(w http.ResponseWriter, err error) {
 	w.WriteHeader(http.StatusBadRequest)
-	w.Write([]byte(err.Error()))
+	_, writeErr := w.Write([]byte(err.Error()))
+	if err != nil {
+		log.Println(writeErr)
+	}
 }
 
 func sendJSONResponse(w http.ResponseWriter, jsonResponse []byte) {
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
-	w.Write(jsonResponse)
+	_, err := w.Write(jsonResponse)
+	if err != nil {
+		log.Println(err)
+	}
 }

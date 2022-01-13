@@ -10,78 +10,113 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
+var testRegisterRepository = []struct {
+	mockArgument      string
+	createUserRequest *auth.CreateUserRequest
+	err               error
+}{
+	{
+		mockArgument: "UName",
+		createUserRequest: &auth.CreateUserRequest{
+			UserName: "UName",
+			Password: "Password",
+		},
+		err: nil,
+	},
+	{
+		mockArgument: "UsedName",
+		createUserRequest: &auth.CreateUserRequest{
+			UserName: "UsedName",
+			Password: "Password",
+		},
+		err: errors.New("fail"),
+	},
+}
+
+var testInvalidUser = []struct {
+	invalidUserRequest auth.CreateUserRequest
+}{
+	{
+		invalidUserRequest: auth.CreateUserRequest{
+			UserName: "sh",
+			Password: "VeryValidPassword",
+		},
+	},
+	{
+		invalidUserRequest: auth.CreateUserRequest{
+			UserName: "VeryValidUserName",
+			Password: "pwd",
+		},
+	},
+}
+
+func initUserService() (*User, *mocks.UserRepository, *mocks.OTPService) {
+	userRepository := &mocks.UserRepository{}
+	otpService := &mocks.OTPService{}
+	userService := NewUserService(userRepository, otpService, "url/")
+	return userService, userRepository, otpService
+}
+
 func TestRegister(t *testing.T) {
-	userRepository := mocks.UserRepository{}
-	OtpService := mocks.OTPService{}
-	createUserRequest := auth.CreateUserRequest{
-		UserName: "UName",
-		Password: "Password",
-	}
-	userService := NewUserService(&userRepository, &OtpService, "abc")
-	uDao := &dao.User{
+	userDAO := &dao.User{
 		ID:       "id",
 		Login:    "UName",
 		Password: "Password",
 	}
-	userRepository.On("Create", "UName", mock.Anything).Return(uDao, nil)
+	for _, testCase := range testRegisterRepository {
+		userService, userRepository, _ := initUserService()
+		userRepository.On("Create", testCase.mockArgument, mock.Anything).Return(userDAO, testCase.err)
+		_, err := userService.Register(*testCase.createUserRequest)
 
-	createUserResponse, err := userService.Register(createUserRequest)
-
-	if *createUserResponse.UserName != createUserRequest.UserName {
-		t.Error("Created user should have same name")
-	}
-	if err != nil {
-		t.Errorf("No errors expected: %s", err.Error())
-	}
-
-	createUserRequest = auth.CreateUserRequest{
-		UserName: "sh",
-		Password: "Pass",
-	}
-	_, err = userService.Register(createUserRequest)
-	if err == nil {
-		t.Errorf("Expected error for short fields")
+		if err != testCase.err {
+			t.Errorf("No errors expected: %s", err.Error())
+		}
 	}
 
-	createUserRequestUsed := auth.CreateUserRequest{
-		UserName: "UsedName",
-		Password: "Password",
+	for _, testCase := range testInvalidUser {
+		userService, _, _ := initUserService()
+		_, err := userService.Register(testCase.invalidUserRequest)
+		if err == nil {
+			t.Error("User shouldn't be created with invalid params")
+		}
 	}
-	userRepository.On("Create", "UsedName", mock.Anything).Return(nil, errors.New("Fail"))
-	_, err = userService.Register(createUserRequestUsed)
-	if err == nil {
-		t.Error("Error is expected")
-	}
+
+}
+
+var testAuthorize = []struct {
+	dao              *dao.User
+	loginUserRequest *auth.LoginUserRequest
+}{
+	{
+		dao: &dao.User{},
+		loginUserRequest: &auth.LoginUserRequest{
+			UserName: "UNameValid",
+			Password: "Password",
+		},
+	},
+	{
+		dao: nil,
+		loginUserRequest: &auth.LoginUserRequest{
+			UserName: "UNameInvalid",
+			Password: "Password",
+		},
+	},
 }
 
 func TestAuthorize(t *testing.T) {
-	userRepository := mocks.UserRepository{}
-	OtpService := mocks.OTPService{}
-	userService := NewUserService(&userRepository, &OtpService, "url/")
-	loginRequestValid := auth.LoginUserRequest{
-		UserName: "UNameValid",
-		Password: "Password",
-	}
-	loginRequestInvalid := auth.LoginUserRequest{
-		UserName: "UNameInvalid",
-		Password: "Password",
-	}
 
-	userDao := &dao.User{}
-	userRepository.On("Get", "UNameValid", mock.Anything).Return(userDao, nil)
-	OtpService.On("GenerateOTP").Return("OTP")
-	response, err := userService.Authorize(loginRequestValid)
-	if err != nil {
-		t.Error("No errors expected")
-	}
-	if response.Url != "url/OTP" {
-		t.Errorf("Wrong url %s", response.Url)
-	}
+	for _, testCase := range testAuthorize {
+		userService, userRepository, otpService := initUserService()
+		otpService.On("GenerateOTP").Return("OTP")
 
-	userRepository.On("Get", "UNameInvalid", mock.Anything).Return(nil, errors.New(""))
-	_, err = userService.Authorize(loginRequestInvalid)
-	if err == nil {
-		t.Error("Error is expected")
+		userRepository.On("Get", testCase.loginUserRequest.UserName, mock.Anything).Return(testCase.dao, nil)
+		response, err := userService.Authorize(*testCase.loginUserRequest)
+		if err != nil {
+			t.Error("No errors expected")
+		}
+		if response.Url != "url/OTP" {
+			t.Errorf("Wrong url %s", response.Url)
+		}
 	}
 
 }
