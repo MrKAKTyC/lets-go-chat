@@ -13,28 +13,15 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-type UserService interface {
-	Register(user auth.CreateUserRequest) (*auth.CreateUserResponse, error)
-	Authorize(user auth.LoginUserRequest) (*auth.LoginUserResponse, error)
-}
-
-type ChatRoom interface {
-	Run()
-	GetActiveUsers() int
-	Join(activeUser *websocket.ActiveUser)
-	Leave(activeUser *websocket.ActiveUser)
-	ServeWs(ctx echo.Context, params types.WsRTMStartParams) error
-}
-
 type User struct {
-	UserService UserService
-	ChatRoom    ChatRoom
+	UserService *service.UserService
+	ChatRoom    *websocket.Room
 }
 
-func NewUser(userService service.User, chatRoom websocket.ChatRoom) *User {
+func NewUser(userService *service.UserService, chatRoom *websocket.Room) *User {
 	return &User{
-		UserService: &userService,
-		ChatRoom:    &chatRoom,
+		UserService: userService,
+		ChatRoom:    chatRoom,
 	}
 }
 
@@ -42,7 +29,7 @@ func NewUser(userService service.User, chatRoom websocket.ChatRoom) *User {
 func (c *User) CreateUser(ctx echo.Context) error {
 	req := ctx.Request()
 	login, password := req.FormValue("userName"), req.FormValue("password")
-	user, err := c.UserService.Register(auth.CreateUserRequest{Password: password, UserName: login})
+	user, err := (*c.UserService).Register(auth.CreateUserRequest{Password: password, UserName: login})
 	if err != nil {
 		sendError(ctx.Response().Writer, err)
 		return err
@@ -60,7 +47,7 @@ func (c *User) CreateUser(ctx echo.Context) error {
 func (c *User) LoginUser(ctx echo.Context) error {
 	req := ctx.Request()
 	login, password := req.FormValue("userName"), req.FormValue("password")
-	resp, err := c.UserService.Authorize(auth.LoginUserRequest{Password: password, UserName: login})
+	resp, err := (*c.UserService).Authorize(auth.LoginUserRequest{Password: password, UserName: login})
 	if err != nil {
 		sendError(ctx.Response().Writer, err)
 		return err
@@ -73,13 +60,13 @@ func (c *User) LoginUser(ctx echo.Context) error {
 }
 
 func (c *User) GetActiveUsers(ctx echo.Context) error {
-	activeUsers, err := json.Marshal(c.ChatRoom.GetActiveUsers())
+	activeUsers, err := json.Marshal((*c.ChatRoom).GetActiveUsers())
 	sendJSONResponse(ctx.Response().Writer, activeUsers)
 	return err
 }
 
 func (c *User) WsRTMStart(ctx echo.Context, params types.WsRTMStartParams) error {
-	err := c.ChatRoom.ServeWs(ctx, params)
+	err := (*c.ChatRoom).ServeWs(ctx, params)
 	if err != nil {
 		sendError(ctx.Response().Writer, err)
 	}

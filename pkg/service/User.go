@@ -2,34 +2,31 @@ package service
 
 import (
 	"errors"
+	"github.com/MrKAKTyC/lets-go-chat/pkg/repository"
 
-	"github.com/MrKAKTyC/lets-go-chat/pkg/dao"
 	"github.com/MrKAKTyC/lets-go-chat/pkg/generated/auth"
 	"github.com/MrKAKTyC/lets-go-chat/pkg/hasher"
 )
 
-type UserRepository interface {
-	Get(login, password string) (*dao.User, error)
-	Create(login, password string) (*dao.User, error)
-}
-
-type OTPService interface {
-	GenerateOTP(userId string) string
-	UseOTP(otpToUse string) (string, error)
+type UserService interface {
+	Register(user auth.CreateUserRequest) (*auth.CreateUserResponse, error)
+	Authorize(user auth.LoginUserRequest) (*auth.LoginUserResponse, error)
 }
 
 type User struct {
-	repository UserRepository
-	otpService OTPService
+	repository *repository.UserRepository
+	otpService *OTPService
 	url        string
 }
 
-func NewUserService(userRepository UserRepository, otpService OTPService, authUrl string) *User {
-	return &User{
+func NewUser(userRepository *repository.UserRepository, otpService *OTPService) *UserService {
+	var us UserService
+	us = &User{
 		repository: userRepository,
 		otpService: otpService,
-		url:        authUrl,
+		url:        "/chat/ws.rtm.start?token=",
 	}
+	return &us
 }
 
 func (u *User) Register(user auth.CreateUserRequest) (*auth.CreateUserResponse, error) {
@@ -41,7 +38,7 @@ func (u *User) Register(user auth.CreateUserRequest) (*auth.CreateUserResponse, 
 		return nil, err
 	}
 	user.Password = userPassword
-	userDao, err := u.repository.Create(user.UserName, user.Password)
+	userDao, err := (*u.repository).Create(user.UserName, user.Password)
 	if err != nil {
 		return nil, err
 	}
@@ -55,9 +52,9 @@ func (u *User) Authorize(user auth.LoginUserRequest) (*auth.LoginUserResponse, e
 		return nil, err
 	}
 	user.Password = userPassword
-	userDAO, err := u.repository.Get(user.UserName, user.Password)
+	userDAO, err := (*u.repository).Get(user.UserName, user.Password)
 	if err != nil {
 		return nil, err
 	}
-	return &auth.LoginUserResponse{Url: u.url + u.otpService.GenerateOTP(userDAO.ID)}, nil
+	return &auth.LoginUserResponse{Url: u.url + (*u.otpService).GenerateOTP(userDAO.ID)}, nil
 }

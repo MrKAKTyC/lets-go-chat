@@ -6,6 +6,7 @@ import (
 )
 
 func main() {
-	config := config.InitConfig()
-	serv.Serve(config)
+	conf := config.InitConfig()
+	userController := InitializeController(conf)
+	serv.Serve(conf.Server.Port, *userController)
 }

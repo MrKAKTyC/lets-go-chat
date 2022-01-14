@@ -9,19 +9,26 @@ import (
 	_ "github.com/lib/pq"
 )
 
-type messagePGS struct {
+type MessagePGS struct {
 	db sql.DB
 }
 
-func MessagePGS(db *sql.DB) *messagePGS {
-	return &messagePGS{db: *db}
+type MessageRepository interface {
+	GetAfter(after time.Time) ([]*dao.Message, error)
+	Create(message dao.Message) error
 }
 
-func (r messagePGS) GetAfter(after time.Time) ([]*dao.Message, error) {
+func NewMessagePGS(db *sql.DB) *MessageRepository {
+	var repo MessageRepository
+	repo = &MessagePGS{db: *db}
+	return &repo
+}
+
+func (r *MessagePGS) GetAfter(after time.Time) ([]*dao.Message, error) {
 	messages := make([]*dao.Message, 0)
 	rows, err := r.db.Query("SELECT senderid, content, sendat FROM messages WHERE sendAt > $1", after)
 	if err != nil {
-		log.Printf("[MessagePGS::GetAfter] Query failed: %v\n", err)
+		log.Printf("[NewMessagePGS::GetAfter] Query failed: %v\n", err)
 		return nil, err
 	}
 	for rows.Next() {
@@ -42,10 +49,10 @@ func (r messagePGS) GetAfter(after time.Time) ([]*dao.Message, error) {
 	return messages, nil
 }
 
-func (repo messagePGS) Create(message dao.Message) error {
+func (repo *MessagePGS) Create(message dao.Message) error {
 	_, err := repo.db.Exec("INSERT INTO messages (senderID, content, sendat) VALUES ($1, $2, $3)", message.Sender, message.Content, message.Date)
 	if err != nil {
-		log.Printf("[MessagePGS::Create] Query failed: %v\n", err)
+		log.Printf("[NewMessagePGS::Create] Query failed: %v\n", err)
 		return err
 	}
 
