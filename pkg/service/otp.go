@@ -1,34 +1,35 @@
 package service
 
 import (
-	"errors"
 	"fmt"
+	"github.com/MrKAKTyC/lets-go-chat/pkg/repository"
 	"math/rand"
 	"time"
 )
 
-type OtpService struct {
-	otpStorage map[string]string
+type OTPService interface {
+	GenerateOTP(userId string) string
+	UseOTP(otpToUse string) (string, error)
 }
 
-func NewOtp(storage map[string]string) *OtpService {
-	return &OtpService{otpStorage: storage}
+type OtpService struct {
+	otpStorage *repository.OtpStorage
+}
+
+func NewOtp(storage *repository.OtpStorage) *OTPService {
+	var otp OTPService
+	otp = &OtpService{otpStorage: storage}
+	return &otp
 }
 
 func (s *OtpService) GenerateOTP(userId string) string {
 	rand.Seed(time.Now().Unix())
 	otpInt := rand.Int31()
 	otp := fmt.Sprintf("%010d", otpInt)
-	s.otpStorage[otp] = userId
+	(*s.otpStorage).Put(otp, userId)
 	return otp
 }
 
 func (s *OtpService) UseOTP(otpToUse string) (string, error) {
-	userId, ok := s.otpStorage[otpToUse]
-	if ok {
-		delete(s.otpStorage, otpToUse)
-		return userId, nil
-	}
-	return "", errors.New("no such otp")
-
+	return (*s.otpStorage).Get(otpToUse)
 }

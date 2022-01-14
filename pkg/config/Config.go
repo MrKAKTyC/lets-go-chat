@@ -2,22 +2,22 @@ package config
 
 import "os"
 
-type dbConfig struct {
+type DBConfig struct {
 	Username, URL, DBName string
 }
 
-type serverConfig struct {
+type ServerConfig struct {
 	Port string
 }
 
 type Config struct {
-	DB     dbConfig
-	Server serverConfig
+	DB     DBConfig
+	Server ServerConfig
 }
 
 func InitConfig() Config {
-	db := dbConfig{URL: os.Getenv("DATABASE_URL")}
-	server := serverConfig{Port: os.Getenv("PORT")}
+	db := DBConfig{URL: os.Getenv("DATABASE_URL")}
+	server := ServerConfig{Port: os.Getenv("PORT")}
 
 	return Config{db, server}
 }

@@ -1,6 +1,7 @@
 package websocket
 
 import (
+	"github.com/MrKAKTyC/lets-go-chat/pkg/repository"
 	"log"
 	"time"
 
@@ -10,40 +11,38 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-type messageRepository interface {
-	GetAfter(after time.Time) ([]*dao.Message, error)
-	Create(message dao.Message) error
-}
-
-type userRepository interface {
-	Get(login, password string) (*dao.User, error)
-	Create(login, password string) (*dao.User, error)
-	GetLastOnline(userID string) (*time.Time, error)
-	UpdateLastOnline(userID string, logoutDate time.Time) error
+type Room interface {
+	Run()
+	GetActiveUsers() int
+	Join(activeUser *ActiveUser)
+	Leave(activeUser *ActiveUser)
+	ServeWs(ctx echo.Context, params types.WsRTMStartParams) error
 }
 
 type ChatRoom struct {
 	clients     map[*ActiveUser]bool
 	messageChan chan dao.Message
-	otpService  *service.OtpService
-	messageRepo messageRepository
-	userRepo    userRepository
+	otpService  *service.OTPService
+	messageRepo *repository.MessageRepository
+	userRepo    *repository.UserRepository
 }
 
-func NewChatRoom(otpService *service.OtpService, messageRepo messageRepository, userRepo userRepository) *ChatRoom {
-	return &ChatRoom{
+func NewChatRoom(otpService *service.OTPService, messageRepo *repository.MessageRepository, userRepo *repository.UserRepository) *Room {
+	var room Room
+	room = &ChatRoom{
 		clients:     make(map[*ActiveUser]bool),
 		messageChan: make(chan dao.Message),
 		otpService:  otpService,
 		messageRepo: messageRepo,
 		userRepo:    userRepo,
 	}
+	return &room
 }
 
 func (cr *ChatRoom) Run() {
 	for {
 		message := <-cr.messageChan
-		cr.messageRepo.Create(message)
+		(*cr.messageRepo).Create(message)
 		for client := range cr.clients {
 			client.inbox <- message
 		}
@@ -57,12 +56,12 @@ func (cr *ChatRoom) GetActiveUsers() int {
 func (cr *ChatRoom) Join(activeUser *ActiveUser) {
 	log.Printf("User %s is joining", activeUser.realUserID)
 	cr.clients[activeUser] = true
-	userLastOnlineTime, err := cr.userRepo.GetLastOnline(activeUser.realUserID)
+	userLastOnlineTime, err := (*cr.userRepo).GetLastOnline(activeUser.realUserID)
 	if err != nil {
 		log.Printf("Cant get last online for user %s\n%s", activeUser.realUserID, err)
 	}
 	log.Printf("%s last online: %s", activeUser.realUserID, userLastOnlineTime)
-	missedMessages, err := cr.messageRepo.GetAfter(*userLastOnlineTime)
+	missedMessages, err := (*cr.messageRepo).GetAfter(*userLastOnlineTime)
 	log.Printf("%s missed %d message(s)", activeUser.realUserID, len(missedMessages))
 	if err != nil {
 		log.Println(err)
@@ -75,12 +74,12 @@ func (cr *ChatRoom) Join(activeUser *ActiveUser) {
 func (cr *ChatRoom) Leave(activeUser *ActiveUser) {
 	log.Printf("User %s is leaving", activeUser.realUserID)
 	delete(cr.clients, activeUser)
-	cr.userRepo.UpdateLastOnline(activeUser.realUserID, time.Now())
+	(*cr.userRepo).UpdateLastOnline(activeUser.realUserID, time.Now())
 	activeUser.conn.Close()
 }
 func (cr *ChatRoom) ServeWs(ctx echo.Context, params types.WsRTMStartParams) error {
 	log.Printf("Obtaining OTP for: %s", params.Token)
-	userID, err := cr.otpService.UseOTP(params.Token)
+	userID, err := (*cr.otpService).UseOTP(params.Token)
 	if err != nil {
 		log.Println(err)
 		return err
