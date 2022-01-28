@@ -1,9 +1,10 @@
 package serv
 
 import (
+	"database/sql"
+	log2 "github.com/labstack/gommon/log"
 	"log"
 	"net/http"
-	"time"
 
 	"github.com/MrKAKTyC/lets-go-chat/pkg/config"
 	"github.com/MrKAKTyC/lets-go-chat/pkg/controller"
@@ -18,9 +19,21 @@ import (
 
 func Serve(config config.Config) {
 	router := echo.New()
-	userRepository := repository.UserPGS(config.DB.URL)
-	otpService := service.NewOtpService(make(map[string]time.Time))
-	chatRoom := websocket.NewChatRoom(otpService)
+	dbConnection, err := repository.GetDBConnection(config.DB.URL)
+	if err != nil {
+		return
+	}
+	defer func(dbConnection *sql.DB) {
+		err := dbConnection.Close()
+		if err != nil {
+			log2.Print(err)
+		}
+	}(dbConnection)
+	userRepository := repository.UserPGS(dbConnection)
+	messageRepository := repository.MessagePGS(dbConnection)
+	otpService := service.NewOtp(make(map[string]string))
+
+	chatRoom := websocket.NewChatRoom(otpService, messageRepository, userRepository)
 	userService := service.NewUserService(userRepository, otpService, "/chat/ws.rtm.start?token=")
 
 	go chatRoom.Run()

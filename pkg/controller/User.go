@@ -21,7 +21,8 @@ type UserService interface {
 type ChatRoom interface {
 	Run()
 	GetActiveUsers() int
-	Join(activeUser *websocket.ActiveUser) error
+	Join(activeUser *websocket.ActiveUser)
+	Leave(activeUser *websocket.ActiveUser)
 	ServeWs(ctx echo.Context, params types.WsRTMStartParams) error
 }
 

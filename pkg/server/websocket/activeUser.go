@@ -5,6 +5,7 @@ import (
 	"log"
 	"time"
 
+	"github.com/MrKAKTyC/lets-go-chat/pkg/dao"
 	"github.com/gorilla/websocket"
 )
 
@@ -26,19 +27,20 @@ var upgrader = websocket.Upgrader{
 }
 
 type ActiveUser struct {
-	chatRoom *ChatRoom
-	conn     *websocket.Conn
-	send     chan []byte
+	realUserID string
+	chatRoom   *ChatRoom
+	conn       *websocket.Conn
+	inbox      chan dao.Message
 }
 
 func (au *ActiveUser) ReadMessage() {
 	defer func() {
-		delete(au.chatRoom.clients, au)
-		au.conn.Close()
+		au.chatRoom.Leave(au)
 	}()
 	au.conn.SetReadLimit(maxMessageSize)
 	au.conn.SetReadDeadline(time.Now().Add(pongWait))
 	au.conn.SetPongHandler(func(string) error { au.conn.SetReadDeadline(time.Now().Add(pongWait)); return nil })
+
 	for {
 		_, message, err := au.conn.ReadMessage()
 		if err != nil {
@@ -48,7 +50,11 @@ func (au *ActiveUser) ReadMessage() {
 			break
 		}
 		message = bytes.TrimSpace(bytes.Replace(message, newline, space, -1))
-		au.chatRoom.broadcast <- message
+		au.chatRoom.messageChan <- dao.Message{
+			Sender:  au.realUserID,
+			Content: string(message),
+			Date:    time.Now(),
+		}
 	}
 }
 
@@ -60,25 +66,22 @@ func (au *ActiveUser) WriteMessage() {
 	}()
 	for {
 		select {
-		case message, ok := <-au.send:
+		case message, ok := <-au.inbox:
 			au.conn.SetWriteDeadline(time.Now().Add(writeWait))
 			if !ok {
 				au.conn.WriteMessage(websocket.CloseMessage, []byte{})
 				return
 			}
 
-			w, err := au.conn.NextWriter(websocket.TextMessage)
+			writer, err := au.conn.NextWriter(websocket.TextMessage)
 			if err != nil {
+				log.Println(err)
 				return
 			}
-			w.Write(message)
-			n := len(au.send)
-			for i := 0; i < n; i++ {
-				w.Write(newline)
-				w.Write(<-au.send)
-			}
+			writer.Write([]byte(message.Content))
 
-			if err := w.Close(); err != nil {
+			if err := writer.Close(); err != nil {
+				log.Println(err)
 				return
 			}
 		case <-ticker.C:

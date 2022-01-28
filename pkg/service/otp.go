@@ -8,28 +8,27 @@ import (
 )
 
 type OtpService struct {
-	otpStorage map[string]time.Time
+	otpStorage map[string]string
 }
 
-func NewOtpService(storage map[string]time.Time) *OtpService {
+func NewOtp(storage map[string]string) *OtpService {
 	return &OtpService{otpStorage: storage}
 }
 
-func (s *OtpService) GenerateOTP() string {
+func (s *OtpService) GenerateOTP(userId string) string {
 	rand.Seed(time.Now().Unix())
 	otpInt := rand.Int31()
 	otp := fmt.Sprintf("%010d", otpInt)
-	s.otpStorage[otp] = time.Now()
+	s.otpStorage[otp] = userId
 	return otp
 }
 
-func (s *OtpService) UseOTP(otpToUse string) error {
-	_, ok := s.otpStorage[otpToUse]
-	var err error
+func (s *OtpService) UseOTP(otpToUse string) (string, error) {
+	userId, ok := s.otpStorage[otpToUse]
 	if ok {
 		delete(s.otpStorage, otpToUse)
-	} else {
-		err = errors.New("no such otp")
+		return userId, nil
 	}
-	return err
+	return "", errors.New("no such otp")
+
 }
