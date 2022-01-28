@@ -11,8 +11,8 @@ type OtpService struct {
 	otpStorage map[string]time.Time
 }
 
-func NewOtpService() OtpService {
-	return OtpService{otpStorage: make(map[string]time.Time)}
+func NewOtpService(storage map[string]time.Time) *OtpService {
+	return &OtpService{otpStorage: storage}
 }
 
 func (s *OtpService) GenerateOTP() string {

@@ -9,8 +9,8 @@ type LoginUserRequest struct {
 	UserName string `json:"userName"`
 }
 
-// LoginUserResonse defines model for LoginUserResonse.
-type LoginUserResonse struct {
+// LoginUserResponse defines model for LoginUserResponse.
+type LoginUserResponse struct {
 	// A url for websoket API with a one-time token for starting chat
 	Url string `json:"url"`
 }

@@ -11,10 +11,10 @@ import (
 type ChatRoom struct {
 	clients    map[*ActiveUser]bool
 	broadcast  chan []byte
-	otpService service.OtpService
+	otpService *service.OtpService
 }
 
-func NewChatRoom(otpService service.OtpService) *ChatRoom {
+func NewChatRoom(otpService *service.OtpService) *ChatRoom {
 	return &ChatRoom{
 		broadcast:  make(chan []byte),
 		clients:    make(map[*ActiveUser]bool),
@@ -39,7 +39,7 @@ func (cr *ChatRoom) Join(activeUser *ActiveUser) error {
 	cr.clients[activeUser] = true
 	return nil
 }
-func ServeWs(cr *ChatRoom, ctx echo.Context, params types.WsRTMStartParams) error {
+func (cr *ChatRoom) ServeWs(ctx echo.Context, params types.WsRTMStartParams) error {
 	err := cr.otpService.UseOTP(params.Token)
 	if err != nil {
 		return err

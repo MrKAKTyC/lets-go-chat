@@ -3,6 +3,7 @@ package serv
 import (
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/MrKAKTyC/lets-go-chat/pkg/config"
 	"github.com/MrKAKTyC/lets-go-chat/pkg/controller"
@@ -18,12 +19,12 @@ import (
 func Serve(config config.Config) {
 	router := echo.New()
 	userRepository := repository.UserPGS(config.DB.URL)
-	otpService := service.NewOtpService()
+	otpService := service.NewOtpService(make(map[string]time.Time))
 	chatRoom := websocket.NewChatRoom(otpService)
 	userService := service.NewUserService(userRepository, otpService, "/chat/ws.rtm.start?token=")
 
 	go chatRoom.Run()
-	userController := controller.NewUser(userService, *chatRoom)
+	userController := controller.NewUser(*userService, *chatRoom)
 
 	router.Use(middleware.PanicRecoverer)
 	router.Use(middleware.ErrorLogger)
