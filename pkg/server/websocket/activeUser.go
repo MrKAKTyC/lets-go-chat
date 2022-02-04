@@ -45,7 +45,7 @@ func (au *ActiveUser) ReadMessage() {
 		_, message, err := au.conn.ReadMessage()
 		if err != nil {
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
-				log.Printf("error: %v", err)
+				log.Print("error: ", err)
 			}
 			break
 		}

@@ -31,7 +31,7 @@ func (repo *UserPGS) Get(login, password string) (*dao.User, error) {
 	user := dao.User{}
 	err := repo.db.QueryRow("SELECT id, username, password FROM users WHERE username LIKE $1 AND password LIKE $2", login, password).Scan(&user.ID, &user.Login, &user.Password)
 	if err != nil {
-		log.Printf("NewUserPGS::Get Query failed: %v\n", err)
+		log.Println("NewUserPGS::Get Query failed: ", err)
 		return nil, err
 	}
 
@@ -42,7 +42,7 @@ func (repo *UserPGS) Create(login, password string) (*dao.User, error) {
 	userUUID := uuid.New().String()
 	_, err := repo.db.Exec("INSERT INTO users (id, username, password) VALUES ($1, $2, $3)", userUUID, login, password)
 	if err != nil {
-		log.Printf("NewUserPGS::Create Query failed: %v\n", err)
+		log.Println("NewUserPGS::Create Query failed: ", err)
 		return nil, err
 	}
 
@@ -53,7 +53,7 @@ func (repo *UserPGS) GetLastOnline(userID string) (*time.Time, error) {
 	lastOnline := new(time.Time)
 	err := repo.db.QueryRow("SELECT lastonline FROM users WHERE id::text LIKE $1", userID).Scan(lastOnline)
 	if err != nil {
-		log.Printf("NewUserPGS::GetLastOnline Query failed: %v\n", err)
+		log.Println("NewUserPGS::GetLastOnline Query failed: ", err)
 		return nil, err
 	}
 	return lastOnline, err

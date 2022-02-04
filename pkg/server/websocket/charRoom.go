@@ -54,15 +54,16 @@ func (cr *ChatRoom) GetActiveUsers() int {
 }
 
 func (cr *ChatRoom) Join(activeUser *ActiveUser) {
-	log.Printf("User %s is joining", activeUser.realUserID)
+	log.Println("User ", activeUser.realUserID, " is joining")
 	cr.clients[activeUser] = true
 	userLastOnlineTime, err := (*cr.userRepo).GetLastOnline(activeUser.realUserID)
 	if err != nil {
-		log.Printf("Cant get last online for user %s\n%s", activeUser.realUserID, err)
+		log.Println("Cant get last online for user", activeUser.realUserID)
+		log.Println(err)
 	}
-	log.Printf("%s last online: %s", activeUser.realUserID, userLastOnlineTime)
+	log.Println(activeUser.realUserID, "last online: ", userLastOnlineTime)
 	missedMessages, err := (*cr.messageRepo).GetAfter(*userLastOnlineTime)
-	log.Printf("%s missed %d message(s)", activeUser.realUserID, len(missedMessages))
+	log.Println(activeUser.realUserID, "missed", len(missedMessages), "message(s)")
 	if err != nil {
 		log.Println(err)
 	}
@@ -72,19 +73,19 @@ func (cr *ChatRoom) Join(activeUser *ActiveUser) {
 }
 
 func (cr *ChatRoom) Leave(activeUser *ActiveUser) {
-	log.Printf("User %s is leaving", activeUser.realUserID)
+	log.Println("User ", activeUser.realUserID, " is leaving")
 	delete(cr.clients, activeUser)
 	(*cr.userRepo).UpdateLastOnline(activeUser.realUserID, time.Now())
 	activeUser.conn.Close()
 }
 func (cr *ChatRoom) ServeWs(ctx echo.Context, params types.WsRTMStartParams) error {
-	log.Printf("Obtaining OTP for: %s", params.Token)
+	log.Println("Obtaining OTP for: ", params.Token)
 	userID, err := (*cr.otpService).UseOTP(params.Token)
 	if err != nil {
 		log.Println(err)
 		return err
 	}
-	log.Printf("Upgrading connection for: %s", userID)
+	log.Println("Upgrading connection for: ", userID)
 	conn, err := upgrader.Upgrade(ctx.Response().Writer, ctx.Request(), nil)
 	if err != nil {
 		log.Println(err)
