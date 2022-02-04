@@ -8,7 +8,7 @@ import (
 func RequestLogger(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(context echo.Context) error {
 		request := context.Request()
-		log.Println(request.Method + " " + request.URL.String())
+		log.Println(request.Method, request.URL.String())
 		return next(context)
 	}
 }

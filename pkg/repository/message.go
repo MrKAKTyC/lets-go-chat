@@ -28,7 +28,7 @@ func (r *MessagePGS) GetAfter(after time.Time) ([]*dao.Message, error) {
 	messages := make([]*dao.Message, 0)
 	rows, err := r.db.Query("SELECT senderid, content, sendat FROM messages WHERE sendAt > $1", after)
 	if err != nil {
-		log.Printf("[NewMessagePGS::GetAfter] Query failed: %v\n", err)
+		log.Println("[NewMessagePGS::GetAfter] Query failed: ", err)
 		return nil, err
 	}
 	for rows.Next() {
@@ -52,7 +52,7 @@ func (r *MessagePGS) GetAfter(after time.Time) ([]*dao.Message, error) {
 func (repo *MessagePGS) Create(message dao.Message) error {
 	_, err := repo.db.Exec("INSERT INTO messages (senderID, content, sendat) VALUES ($1, $2, $3)", message.Sender, message.Content, message.Date)
 	if err != nil {
-		log.Printf("[NewMessagePGS::Create] Query failed: %v\n", err)
+		log.Println("[NewMessagePGS::Create] Query failed: ", err)
 		return err
 	}
 

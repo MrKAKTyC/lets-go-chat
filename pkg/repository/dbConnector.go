@@ -19,7 +19,7 @@ func GetDBConnection(config config.DBConfig) *sql.DB {
 		if err != nil {
 			log.Fatal(err)
 		}
-		log.Printf("connection to %s established", config.URL)
+		log.Print("connection to ", config.URL, " established")
 	}
 	return db
 }
